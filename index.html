@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KarshakMitra Pro — AI Crop Disease Detection</title>
+<meta name="description" content="KarshakMitra Pro uses AI to instantly detect crop diseases from a photo. Get real-time weather risk, prevention tips, and treatment advice.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #22c55e;
+  --green-dark: #16a34a;
+  --green-glow: rgba(34,197,94,0.18);
+  --bg: #0a0f0d;
+  --bg2: #111812;
+  --bg3: #16201a;
+  --card: rgba(22,32,26,0.85);
+  --border: rgba(34,197,94,0.15);
+  --text: #f0fdf4;
+  --muted: #86efac;
+  --muted2: #4b7a5e;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);background-image:radial-gradient(rgba(34,197,94,0.04) 1px,transparent 1px);background-size:24px 24px;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;}
+
+/* APP SHELL — max width so it looks like a mobile app on desktop */
+.app-shell{width:100%;max-width:480px;position:relative;min-height:100vh;background:var(--bg);box-shadow:0 0 80px rgba(0,0,0,0.6);}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.4rem;background:rgba(10,15,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:0.65rem;font-weight:800;font-size:1.1rem;letter-spacing:-0.5px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon svg{width:18px;height:18px;fill:#fff;}
+.logo span{color:var(--green);}
+.lang-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.4rem 0.75rem;font-size:0.8rem;font-family:inherit;cursor:pointer;outline:none;transition:border-color 0.2s;}
+.lang-select:focus{border-color:var(--green);}
+
+/* HERO */
+.hero{padding:6rem 1.5rem 2rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(34,197,94,0.12) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(34,197,94,0.1);border:1px solid var(--border);border-radius:99px;padding:0.35rem 1rem;font-size:0.78rem;font-weight:600;color:var(--green);margin-bottom:1.2rem;letter-spacing:0.5px;}
+.hero-badge span{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
+.hero h1{font-size:clamp(1.9rem,6vw,3rem);font-weight:800;line-height:1.15;letter-spacing:-1px;margin-bottom:1rem;}
+.hero h1 em{font-style:normal;color:var(--green);}
+.hero p{color:var(--muted);max-width:480px;margin:0 auto 2rem;font-size:0.95rem;line-height:1.7;}
+.hero-stats{display:flex;justify-content:center;gap:2.5rem;margin-bottom:2rem;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-val{font-size:1.5rem;font-weight:800;color:var(--green);}
+.stat-lbl{font-size:0.72rem;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* MAIN */
+.main{padding:0 1rem 100px;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn 0.35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* WEATHER CARD */
+.weather-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;margin-bottom:1rem;backdrop-filter:blur(12px);box-shadow:var(--shadow);}
+.weather-header{display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;}
+.weather-icon{display:flex;align-items:center;}
+.weather-header h2{font-size:1rem;font-weight:700;color:var(--text);}
+.weather-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.weather-metric{background:rgba(34,197,94,0.06);border:1px solid var(--border);border-radius:12px;padding:0.9rem;text-align:center;}
+.weather-metric .val{font-size:1.4rem;font-weight:800;color:var(--green);}
+.weather-metric .lbl{font-size:0.72rem;color:var(--muted2);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+.risk-badge{margin-top:0.9rem;padding:0.7rem 1rem;border-radius:12px;font-weight:600;font-size:0.88rem;text-align:center;}
+.risk-low{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
+.risk-med{background:rgba(234,179,8,0.12);color:#fbbf24;border:1px solid rgba(234,179,8,0.2);}
+.risk-high{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+
+/* SCAN CARD */
+.scan-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;backdrop-filter:blur(12px);box-shadow:var(--shadow);}
+.scan-card-title{font-size:0.78rem;font-weight:700;margin-bottom:1rem;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;}
+.scan-grid{display:flex;flex-direction:column;gap:0.75rem;}
+.scan-btn{border:none;border-radius:14px;padding:1rem 1.4rem;cursor:pointer;display:flex;flex-direction:row;align-items:center;gap:1rem;font-family:inherit;font-weight:700;font-size:0.95rem;transition:all 0.25s ease;position:relative;overflow:hidden;text-align:left;width:100%;}
+.scan-btn:active{transform:scale(0.98);}
+.scan-btn-primary{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;box-shadow:0 4px 20px rgba(34,197,94,0.3);}
+.scan-btn-primary:hover{box-shadow:0 6px 28px rgba(34,197,94,0.5);transform:translateY(-2px);}
+.scan-btn-secondary{background:rgba(34,197,94,0.05);color:var(--text);border:1px solid var(--border);}
+.scan-btn-secondary:hover{border-color:var(--green);background:rgba(34,197,94,0.1);transform:translateY(-2px);}
+.scan-btn .btn-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scan-btn-primary .btn-icon{background:rgba(255,255,255,0.2);}
+.scan-btn-secondary .btn-icon{background:rgba(34,197,94,0.1);}
+.scan-btn .btn-icon svg{width:22px;height:22px;}
+.scan-btn-primary .btn-icon svg{stroke:#fff;}
+.scan-btn-secondary .btn-icon svg{stroke:var(--green);}
+.btn-text{display:flex;flex-direction:column;gap:2px;}
+.scan-btn-text{display:flex;flex-direction:column;gap:2px;}
+.scan-btn-label{font-size:0.95rem;font-weight:700;}
+.scan-btn-sub{font-size:0.75rem;font-weight:400;opacity:0.7;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:sticky;bottom:0;left:0;right:0;background:rgba(10,15,13,0.97);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));z-index:50;}
+.nav-btn{background:none;border:none;color:var(--muted2);display:flex;flex-direction:column;align-items:center;gap:4px;padding:0.5rem 2rem;font-size:0.7rem;font-family:inherit;font-weight:600;cursor:pointer;transition:color 0.2s;letter-spacing:0.5px;border-radius:12px;}
+.nav-btn .nav-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.nav-btn .nav-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;transition:stroke 0.2s;}
+.nav-btn.active{color:var(--green);}
+.nav-btn.active .nav-dot{width:4px;height:4px;background:var(--green);border-radius:50%;}
+
+/* HISTORY */
+.section-title{font-size:1.1rem;font-weight:800;margin-bottom:1rem;color:var(--text);display:flex;align-items:center;gap:0.6rem;}
+.section-title svg{width:18px;height:18px;stroke:var(--green);stroke-width:2;fill:none;flex-shrink:0;}
+.history-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;backdrop-filter:blur(12px);}
+.history-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--border);transition:background 0.2s;}
+.history-item:last-child{border-bottom:none;}
+.history-item:hover{background:rgba(34,197,94,0.04);}
+.history-thumb{width:54px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+.history-info{flex:1;min-width:0;}
+.history-disease{font-weight:700;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-meta{font-size:0.73rem;color:var(--muted2);margin-top:3px;}
+.history-empty{padding:3.5rem 1.5rem;text-align:center;color:var(--muted2);font-size:0.88rem;}
+.history-empty .empty-icon{width:48px;height:48px;margin:0 auto 1rem;opacity:0.35;}
+.history-empty .empty-icon svg{width:100%;height:100%;stroke:var(--muted2);stroke-width:1.5;fill:none;}
+
+/* RESULTS */
+.result-image{width:100%;height:230px;object-fit:cover;border-radius:16px;margin-bottom:1.2rem;}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;backdrop-filter:blur(12px);}
+.result-disease{font-size:1.5rem;font-weight:800;color:var(--text);}
+.result-meta{font-size:0.85rem;color:var(--muted2);margin:0.3rem 0 1.2rem;}
+.confidence-bar{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:1.2rem;}
+.confidence-fill{height:100%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:99px;transition:width 1s ease;}
+.tabs{display:flex;gap:0.3rem;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;}
+.tab{flex:1;padding:0.6rem;border-radius:9px;text-align:center;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--muted2);transition:all 0.2s;}
+.tab.active{background:var(--green);color:#fff;}
+.tab-content{display:none;line-height:1.8;font-size:0.9rem;color:var(--muted);}
+.tab-content.active{display:block;animation:fadeIn 0.2s;}
+.tab-content h3{font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:0.6rem;}
+.back-btn{display:flex;align-items:center;gap:0.5rem;background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:0.5rem 1rem;font-family:inherit;font-size:0.85rem;cursor:pointer;margin-bottom:1rem;transition:all 0.2s;}
+.back-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* CAMERA MODAL */
+#camera-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;display:none;justify-content:center;align-items:center;}
+#camera-view{position:relative;width:92%;max-width:480px;}
+#camera-stream{width:100%;border-radius:20px;border:2px solid var(--border);}
+#capture-btn{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;border:4px solid #fff;background:var(--green);cursor:pointer;box-shadow:0 0 20px rgba(34,197,94,0.5);}
+#close-camera-btn{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#file-input{display:none;}
+
+/* LOADER */
+.loader{text-align:center;padding:3rem 1rem;}
+.loader-ring{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader p{color:var(--muted);font-size:0.9rem;}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 0c0 4-2 7-6 9m6-9c0 4 2 7 6 9" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    Karshak<span>Mitra</span>
+  </div>
+  <select class="lang-select" id="language-selector">
+    <option value="en">English</option>
+    <option value="hi">हिन्दी</option>
+    <option value="te">తెలుగు</option>
+  </select>
+</header>
+
+<section class="hero" id="hero-section">
+  <div class="hero-badge"><span></span>AI-Powered • Real-Time</div>
+  <h1>Your Smart <em>Farming</em><br>Companion</h1>
+  <p>Instantly detect crop diseases with a single photo. Get weather-based risk alerts and expert treatment advice.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">38+</div><div class="stat-lbl">Crops Supported</div></div>
+    <div class="stat"><div class="stat-val">95%</div><div class="stat-lbl">Accuracy</div></div>
+    <div class="stat"><div class="stat-val">3s</div><div class="stat-lbl">Avg. Scan Time</div></div>
+  </div>
+</section>
+
+<main class="main">
+  <div id="dashboard-page" class="page active">
+    <div class="weather-card">
+      <div class="weather-header">
+        <span class="weather-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;"><circle cx="12" cy="8" r="4" stroke="var(--green)" stroke-width="2"/><path d="M3 20c0-3.314 4.03-6 9-6s9 2.686 9 6" stroke="var(--green)" stroke-width="2" stroke-linecap="round"/><path d="M16 4.5C17.5 3.5 19 4 20 5.5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/><path d="M8 4.5C6.5 3.5 5 4 4 5.5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <h2 data-key="local_conditions">Local Field Conditions</h2>
+      </div>
+      <div class="weather-grid">
+        <div class="weather-metric"><div class="val" id="temp-val">--°C</div><div class="lbl">Temperature</div></div>
+        <div class="weather-metric"><div class="val" id="hum-val">--%</div><div class="lbl">Humidity</div></div>
+      </div>
+      <div class="risk-badge risk-low" id="disease-risk">Fetching conditions...</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-card-title" data-key="new_scan">Start a New Scan</div>
+      <div class="scan-grid">
+        <button id="camera-btn" class="scan-btn scan-btn-primary">
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="14" rx="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="14" r="3" stroke-width="2"/><path d="M8 7l1.5-3h5L16 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="btn-text">
+            <span class="scan-btn-label" data-key="live_camera">Live Camera</span>
+            <span class="scan-btn-sub">Capture a photo now</span>
+          </span>
+        </button>
+        <button id="upload-btn" class="scan-btn scan-btn-secondary">
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/><path d="M21 15l-5-5L5 21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="btn-text">
+            <span class="scan-btn-label" data-key="upload_image">Upload Image</span>
+            <span class="scan-btn-sub">From your gallery</span>
+          </span>
+        </button>
+        <input type="file" id="file-input" accept="image/*">
+      </div>
+    </div>
+  </div>
+
+  <div id="history-page" class="page">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-key="scan_history">Scan History</span>
+    </div>
+    <div class="history-card" id="history-list">
+      <div class="history-empty">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 0c0 4-2 7-6 9m6-9c0 4 2 7 6 9" stroke-linecap="round"/></svg></div>
+        <span data-key="history_placeholder">Your last 5 scans will appear here.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="results-page" class="page"></div>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="dashboard-page" id="nav-home">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12L12 3l9 9" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v11h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span data-key="nav_dashboard">Home</span>
+    <span class="nav-dot"></span>
+  </button>
+  <button class="nav-btn" data-page="history-page" id="nav-history">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke-linecap="round"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span data-key="nav_history">History</span>
+    <span class="nav-dot"></span>
+  </button>
+</nav>
+
+<div id="camera-modal">
+  <div id="camera-view">
+    <video id="camera-stream" autoplay playsinline></video>
+    <button id="capture-btn"></button>
+    <button id="close-camera-btn">✕</button>
+  </div>
+</div><!-- /#camera-modal -->
+</div><!-- /.app-shell -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const langSelector = document.getElementById('language-selector');
+  const cameraModal = document.getElementById('camera-modal');
+  const cameraStream = document.getElementById('camera-stream');
+  const captureBtn = document.getElementById('capture-btn');
+  const closeCameraBtn = document.getElementById('close-camera-btn');
+  const fileInput = document.getElementById('file-input');
+
+  const translations = {
+    hi: { local_conditions:"स्थानीय मौसम", new_scan:"नया स्कैन शुरू करें", live_camera:"लाइव कैमरा", upload_image:"छवि अपलोड करें", scan_history:"स्कैन इतिहास", history_placeholder:"आपके अंतिम 5 स्कैन यहां दिखाई देंगे।", analysis_result:"विश्लेषण परिणाम", overview:"अवलोकन", prevention:"निवारण", treatment:"उपचार", description:"विवरण", prevention_steps:"निवारण चरण", treatment_advice:"उपचार सलाह", nav_dashboard:"होम", nav_history:"इतिहास" },
+    te: { local_conditions:"స్థానిక పరిస్థితులు", new_scan:"కొత్త స్కాన్", live_camera:"లైవ్ కెమెరా", upload_image:"చిత్రం అప్‌లోడ్", scan_history:"స్కాన్ చరిత్ర", history_placeholder:"మీ చివరి 5 స్కాన్‌లు ఇక్కడ కనిపిస్తాయి.", analysis_result:"విశ్లేషణ ఫలితం", overview:"అవలోకనం", prevention:"నివారణ", treatment:"చికిత్స", description:"వివరణ", prevention_steps:"నివారణ చర్యలు", treatment_advice:"చికిత్స సలహా", nav_dashboard:"హోమ్", nav_history:"చరిత్ర" }
+  };
+
+  function setLanguage(lang) {
+    document.querySelectorAll('[data-key]').forEach(el => {
+      if (!el.dataset.orig) el.dataset.orig = el.textContent;
+      el.textContent = (lang === 'en') ? el.dataset.orig : (translations[lang]?.[el.dataset.key] || el.dataset.orig);
+    });
+  }
+  langSelector.addEventListener('change', e => setLanguage(e.target.value));
+
+  // Navigation
+  const navBtns = document.querySelectorAll('.nav-btn');
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+    if (pageId !== 'results-page') {
+      document.getElementById('hero-section').style.display = '';
+    }
+  }
+  navBtns.forEach(btn => btn.addEventListener('click', () => {
+    showPage(btn.dataset.page);
+    if (btn.dataset.page === 'history-page') loadHistory();
+  }));
+
+  // Weather
+  function fetchWeather(lat, lon) {
+    fetch('/weather', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({lat,lon}) })
+      .then(r => r.json()).then(data => {
+        if (data.error) throw new Error(data.error);
+        document.getElementById('temp-val').textContent = data.temperature + '°C';
+        document.getElementById('hum-val').textContent = data.humidity + '%';
+        const riskEl = document.getElementById('disease-risk');
+        riskEl.textContent = data.risk;
+        riskEl.className = 'risk-badge ' + (data.risk.toLowerCase().includes('high') ? 'risk-high' : data.risk.toLowerCase().includes('moderate') ? 'risk-med' : 'risk-low');
+      }).catch(() => {
+        document.getElementById('disease-risk').textContent = 'Weather unavailable';
+      });
+  }
+  navigator.geolocation.getCurrentPosition(
+    p => fetchWeather(p.coords.latitude, p.coords.longitude),
+    () => { document.getElementById('disease-risk').textContent = 'Enable location for weather'; }
+  );
+
+  // History
+  function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+    const list = document.getElementById('history-list');
+    if (history.length === 0) {
+      list.innerHTML = `<div class="history-empty"><div class="empty-icon">🌱</div><span data-key="history_placeholder">Your last 5 scans will appear here.</span></div>`;
+      setLanguage(langSelector.value); return;
+    }
+    list.innerHTML = history.map(item => `
+      <div class="history-item">
+        <img src="${item.image}" class="history-thumb" alt="scan">
+        <div class="history-info">
+          <div class="history-disease">${item.crop}: ${item.disease}</div>
+          <div class="history-meta">${new Date(item.date).toLocaleString()} · ${(item.confidence*100).toFixed(1)}% confidence</div>
+        </div>
+      </div>`).join('');
+  }
+  function saveHistory(item) {
+    let h = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+    h.unshift(item); h = h.slice(0, 5);
+    localStorage.setItem('scanHistory', JSON.stringify(h));
+  }
+
+  // Camera
+  let stream;
+  document.getElementById('camera-btn').addEventListener('click', async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment' } });
+      cameraStream.srcObject = stream;
+      cameraModal.style.display = 'flex';
+    } catch { alert('Camera permission denied.'); }
+  });
+  closeCameraBtn.addEventListener('click', () => {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    cameraModal.style.display = 'none';
+  });
+  captureBtn.addEventListener('click', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = cameraStream.videoWidth; canvas.height = cameraStream.videoHeight;
+    canvas.getContext('2d').drawImage(cameraStream, 0, 0);
+    canvas.toBlob(blob => handleFile(blob), 'image/jpeg');
+    closeCameraBtn.click();
+  });
+  document.getElementById('upload-btn').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+  async function handleFile(file) {
+    if (!file) return;
+    document.getElementById('hero-section').style.display = 'none';
+    showPage('results-page');
+    document.getElementById('results-page').innerHTML = `<div class="loader"><div class="loader-ring"></div><p>Analyzing your crop...</p></div>`;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const imageDataUrl = reader.result;
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const res = await fetch('/predict', { method:'POST', body:formData });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        displayResults(data, imageDataUrl);
+        saveHistory({...data, image:imageDataUrl, date:new Date()});
+      } catch(err) {
+        alert('Prediction failed. Please try again.');
+        document.getElementById('hero-section').style.display = '';
+        showPage('dashboard-page');
+      }
+    };
+  }
+
+  function displayResults(data, imageUrl) {
+    const pct = (data.confidence * 100).toFixed(1);
+    const isHealthy = data.disease.toLowerCase().includes('healthy');
+    document.getElementById('results-page').innerHTML = `
+      <button class="back-btn" id="back-btn">← Back to Dashboard</button>
+      <img src="${imageUrl}" class="result-image" alt="analyzed crop">
+      <div class="result-card">
+        <div class="result-disease">${isHealthy ? '✅' : '⚠️'} ${data.disease}</div>
+        <div class="result-meta">Crop: <strong>${data.crop}</strong> &nbsp;·&nbsp; Confidence: <strong>${pct}%</strong></div>
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%"></div></div>
+        <div class="tabs">
+          <div class="tab active" data-tab="ov" data-key="overview">Overview</div>
+          <div class="tab" data-tab="pv" data-key="prevention">Prevention</div>
+          <div class="tab" data-tab="tr" data-key="treatment">Treatment</div>
+        </div>
+        <div id="ov" class="tab-content active"><h3 data-key="description">Description</h3><p>${data.description}</p></div>
+        <div id="pv" class="tab-content"><h3 data-key="prevention_steps">Prevention Steps</h3><p>${data.prevention}</p></div>
+        <div id="tr" class="tab-content"><h3 data-key="treatment_advice">Treatment Advice</h3><p>${data.treatment}</p></div>
+      </div>`;
+    document.getElementById('back-btn').addEventListener('click', () => {
+      document.getElementById('hero-section').style.display = '';
+      showPage('dashboard-page');
+    });
+    document.querySelectorAll('#results-page .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#results-page .tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#results-page .tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+    setLanguage(langSelector.value);
+  }
+
+  loadHistory();
+  document.querySelectorAll('[data-key]').forEach(el => el.dataset.orig = el.textContent);
+});
+</script>
+</body>
+</html>
