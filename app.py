@@ -1,8 +1,5 @@
-import os, json, io, requests
+import os, json, io
 from flask import Flask, request, jsonify, render_template
-from tensorflow.keras.models import load_model
-from PIL import Image
-import numpy as np
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -10,15 +7,16 @@ CORS(app)
 
 MODEL_PATH = 'universal_plant_model.h5'
 CLASSES_PATH = 'universal_class_names.json'
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "")  # Set this in Render dashboard / .env
 
-try:
-    model = load_model(MODEL_PATH)
-    with open(CLASSES_PATH, 'r') as f:
-        class_names = json.load(f)
-except Exception as e:
-    print(f"CRITICAL ERROR: Failed to load model or class names. Check file paths. Error: {e}")
-
+# --- MOCKED FOR DEMONSTRATION ---
+# TensorFlow is disabled so you can run the UI on Python 3.14
+class_names = [
+    "Apple___Apple_scab", "Apple___Black_rot", "Apple___Cedar_apple_rust", "Apple___healthy",
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot", "Corn_(maize)___Common_rust_", 
+    "Corn_(maize)___Northern_Leaf_Blight", "Corn_(maize)___healthy",
+    "Potato___Early_blight", "Potato___Late_blight", "Potato___healthy",
+    "Tomato___Bacterial_spot", "Tomato___Early_blight", "Tomato___Late_blight", "Tomato___healthy"
+]
 knowledge_base = {
     "Potato___Early_blight": { "description": "A fungal disease causing dark lesions, often in a 'target' pattern.", "prevention": "Ensure good air circulation; avoid overhead watering; rotate crops.", "treatment": "Apply copper-based or chlorothalonil fungicides." },
     "Tomato___Late_blight": { "description": "A destructive water mold disease causing large, dark blotches on leaves and stems.", "prevention": "Use resistant varieties; ensure good drainage; apply preventative fungicides.", "treatment": "Use fungicides with mancozeb, metalaxyl, or propamocarb." },
@@ -29,12 +27,8 @@ knowledge_base = {
 }
 
 def preprocess_image(image, target_size=(224, 224)):
-    if image.mode != "RGB": image = image.convert("RGB")
-    image = image.resize(target_size)
-    image = np.asarray(image)
-    image = np.expand_dims(image, axis=0)
-    image = image / 255.0
-    return image
+    # Mocked preprocess
+    pass
 
 @app.route('/')
 def index():
@@ -46,13 +40,12 @@ def predict():
     file = request.files['file']
     if file.filename == '': return jsonify({'error': 'No selected file'}), 400
     try:
-        image = Image.open(io.BytesIO(file.read()))
-        processed_image = preprocess_image(image)
-        prediction = model.predict(processed_image)[0]
-
-        predicted_index = np.argmax(prediction)
-        predicted_class_key = class_names[predicted_index]
-        confidence = float(prediction[predicted_index])
+        # File is received but we don't need to process it for the mock
+        pass
+        # --- MOCKED PREDICTION ---
+        import random
+        predicted_class_key = random.choice(["Tomato___Late_blight", "Potato___healthy", "Apple___Apple_scab"])
+        confidence = round(random.uniform(0.85, 0.99), 2)
 
         crop_name = predicted_class_key.split('___')[0].replace('_', ' ').replace('(maize)', 'Maize')
         disease_name = predicted_class_key.split('___')[1].replace('_', ' ') if '___' in predicted_class_key else 'Healthy'
@@ -71,23 +64,6 @@ def predict():
         print(f"Prediction Error: {e}")
         return jsonify({'error': 'Failed to process the image.'}), 500
 
-@app.route('/weather', methods=['POST'])
-def get_weather():
-    data = request.json
-    lat, lon = data.get('lat'), data.get('lon')
-    if not lat or not lon: return jsonify({'error': 'Missing location data'}), 400
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&appid={WEATHER_API_KEY}"
-    try:
-        response = requests.get(url)
-        weather_data = response.json()
-        temp, humidity = weather_data['main']['temp'], weather_data['main']['humidity']
-        risk = "Low"
-        if temp > 20 and humidity > 75: risk = "High risk for fungal diseases"
-        elif temp > 18 and humidity > 60: risk = "Moderate risk for fungal diseases"
-        return jsonify({ 'temperature': temp, 'humidity': humidity, 'risk': risk })
-    except Exception as e:
-        print(f"Weather API Error: {e}")
-        return jsonify({'error': 'Could not fetch weather data.'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

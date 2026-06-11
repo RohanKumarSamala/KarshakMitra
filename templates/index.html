@@ -57,19 +57,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .page.active{display:block;animation:fadeIn 0.35s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* WEATHER CARD */
-.weather-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;margin-bottom:1rem;backdrop-filter:blur(12px);box-shadow:var(--shadow);}
-.weather-header{display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;}
-.weather-icon{display:flex;align-items:center;}
-.weather-header h2{font-size:1rem;font-weight:700;color:var(--text);}
-.weather-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
-.weather-metric{background:rgba(34,197,94,0.06);border:1px solid var(--border);border-radius:12px;padding:0.9rem;text-align:center;}
-.weather-metric .val{font-size:1.4rem;font-weight:800;color:var(--green);}
-.weather-metric .lbl{font-size:0.72rem;color:var(--muted2);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
-.risk-badge{margin-top:0.9rem;padding:0.7rem 1rem;border-radius:12px;font-weight:600;font-size:0.88rem;text-align:center;}
-.risk-low{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
-.risk-med{background:rgba(234,179,8,0.12);color:#fbbf24;border:1px solid rgba(234,179,8,0.2);}
-.risk-high{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+
 
 /* SCAN CARD */
 .scan-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;backdrop-filter:blur(12px);box-shadow:var(--shadow);}
@@ -176,19 +164,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <main class="main">
   <div id="dashboard-page" class="page active">
-    <div class="weather-card">
-      <div class="weather-header">
-        <span class="weather-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;"><circle cx="12" cy="8" r="4" stroke="var(--green)" stroke-width="2"/><path d="M3 20c0-3.314 4.03-6 9-6s9 2.686 9 6" stroke="var(--green)" stroke-width="2" stroke-linecap="round"/><path d="M16 4.5C17.5 3.5 19 4 20 5.5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/><path d="M8 4.5C6.5 3.5 5 4 4 5.5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </span>
-        <h2 data-key="local_conditions">Local Field Conditions</h2>
-      </div>
-      <div class="weather-grid">
-        <div class="weather-metric"><div class="val" id="temp-val">--°C</div><div class="lbl">Temperature</div></div>
-        <div class="weather-metric"><div class="val" id="hum-val">--%</div><div class="lbl">Humidity</div></div>
-      </div>
-      <div class="risk-badge risk-low" id="disease-risk">Fetching conditions...</div>
-    </div>
+
     <div class="scan-card">
       <div class="scan-card-title" data-key="new_scan">Start a New Scan</div>
       <div class="scan-grid">
@@ -294,24 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn.dataset.page === 'history-page') loadHistory();
   }));
 
-  // Weather
-  function fetchWeather(lat, lon) {
-    fetch('/weather', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({lat,lon}) })
-      .then(r => r.json()).then(data => {
-        if (data.error) throw new Error(data.error);
-        document.getElementById('temp-val').textContent = data.temperature + '°C';
-        document.getElementById('hum-val').textContent = data.humidity + '%';
-        const riskEl = document.getElementById('disease-risk');
-        riskEl.textContent = data.risk;
-        riskEl.className = 'risk-badge ' + (data.risk.toLowerCase().includes('high') ? 'risk-high' : data.risk.toLowerCase().includes('moderate') ? 'risk-med' : 'risk-low');
-      }).catch(() => {
-        document.getElementById('disease-risk').textContent = 'Weather unavailable';
-      });
-  }
-  navigator.geolocation.getCurrentPosition(
-    p => fetchWeather(p.coords.latitude, p.coords.longitude),
-    () => { document.getElementById('disease-risk').textContent = 'Enable location for weather'; }
-  );
+
 
   // History
   function loadHistory() {
