@@ -1,3 +1,14 @@
 flask==3.0.3
 flask-cors==4.0.1
 gunicorn==22.0.0
+
+# Inference stack. The model is a Keras 3 file, so Keras runs it on any backend;
+# JAX is used because TensorFlow publishes no wheels for Python 3.14 and is far
+# heavier to install. h5py is what reads the .h5 weights.
+keras==3.15.0
+jax==0.11.0
+jaxlib==0.11.0
+numpy==2.5.1
+scipy==1.18.0
+h5py==3.16.0
+pillow==12.3.0

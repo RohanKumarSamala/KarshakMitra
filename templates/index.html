@@ -1,423 +1,1321 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KarshakMitra — AI Crop Disease Detection</title>
-<meta name="description" content="KarshakMitra uses AI to instantly detect crop diseases from a photo.">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+<meta name="description" content="KarshakMitra uses AI to instantly detect crop diseases from a photo."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-secondary-fixed": "#2f1500",
+                "tertiary-fixed-dim": "#bdcac1",
+                "surface-tint": "#2b6954",
+                "error": "#ba1a1a",
+                "surface-container-low": "#f0f3ff",
+                "secondary": "#904d00",
+                "outline": "#707974",
+                "on-tertiary-container": "#a8b5ad",
+                "on-tertiary-fixed-variant": "#3e4943",
+                "primary-container": "#064e3b",
+                "on-background": "#111c2d",
+                "inverse-primary": "#95d3ba",
+                "background": "#f9f9ff",
+                "surface-dim": "#cfdaf2",
+                "secondary-fixed": "#ffdcc3",
+                "on-surface": "#111c2d",
+                "on-error-container": "#93000a",
+                "on-primary-fixed": "#002117",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-container": "#3b4741",
+                "surface-container": "#e7eeff",
+                "on-surface-variant": "#404944",
+                "on-secondary": "#ffffff",
+                "inverse-surface": "#263143",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#ffb77d",
+                "on-secondary-fixed-variant": "#6e3900",
+                "secondary-container": "#fe932c",
+                "surface": "#f9f9ff",
+                "error-container": "#ffdad6",
+                "surface-container-highest": "#d8e3fb",
+                "tertiary": "#25312b",
+                "on-secondary-container": "#663500",
+                "on-error": "#ffffff",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#131e19",
+                "on-primary-container": "#80bea6",
+                "on-primary-fixed-variant": "#0b513d",
+                "surface-variant": "#d8e3fb",
+                "surface-container-high": "#dee8ff",
+                "inverse-on-surface": "#ecf1ff",
+                "surface-bright": "#f9f9ff",
+                "primary": "#003527",
+                "tertiary-fixed": "#d9e6dd",
+                "primary-fixed": "#b0f0d6",
+                "outline-variant": "#bfc9c3",
+                "primary-fixed-dim": "#95d3ba"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem",
+                "3xl": "1.5rem",
+                "4xl": "2rem",
+                "glass": "24px"
+        },
+        "spacing": {
+                "base": "8px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "margin-desktop": "40px",
+                "container-max": "1280px"
+        },
+        "fontFamily": {
+                "title-md": ["Hanken Grotesk"],
+                "headline-lg": ["Hanken Grotesk"],
+                "label-sm": ["JetBrains Mono"],
+                "body-md": ["Inter"],
+                "body-lg": ["Inter"],
+                "display-lg": ["Hanken Grotesk"]
+        }
+      }
+    }
+  }
+</script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --bg:#0c0c0f;
-  --surface:#13131a;
-  --surface2:#1a1a24;
-  --border:rgba(255,255,255,0.06);
-  --accent:#4ade80;
-  --accent-dim:rgba(74,222,128,0.12);
-  --accent-glow:rgba(74,222,128,0.25);
-  --text:#f1f5f9;
-  --muted:#64748b;
-  --muted2:#94a3b8;
-}
-html,body{height:100%;background:var(--bg);}
-body{font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+    }
 
-/* SHELL */
-.shell{width:100%;max-width:430px;min-height:100vh;display:flex;flex-direction:column;position:relative;background:var(--bg);}
+    /* Ultra glassmorphism surfaces */
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(48px);
+        -webkit-backdrop-filter: blur(48px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    }
+    .glass-panel-dark {
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(48px);
+        -webkit-backdrop-filter: blur(48px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(48px);
+        -webkit-backdrop-filter: blur(48px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.08), 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .ultra-glass {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(64px);
+        -webkit-backdrop-filter: blur(64px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    .chat-bubble-ai {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .status-glow { box-shadow: 0 0 15px rgba(var(--glow-color), 0.5); }
 
-/* TOPBAR */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:1.1rem 1.5rem;
-  position:sticky;top:0;z-index:100;
-  background:rgba(12,12,15,0.85);
-  backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);
-}
-.wordmark{
-  font-family:'Outfit',sans-serif;
-  font-weight:900;
-  font-size:1.3rem;
-  letter-spacing:-0.8px;
-}
-.wordmark .k{color:var(--accent);}
-.wordmark .m{color:var(--text);}
-.lang-select{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  color:var(--muted2);
-  border-radius:8px;
-  padding:0.35rem 0.7rem;
-  font-size:0.78rem;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;
-  outline:none;
-  transition:border-color 0.2s,color 0.2s;
-}
-.lang-select:focus{border-color:var(--accent);color:var(--text);}
+    .scan-line {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #b0f0d6, transparent);
+        animation: scan 4s linear infinite;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        z-index: 10;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    @keyframes scan {
+        0% { top: 0%; opacity: 0; }
+        20% { opacity: 0.6; }
+        80% { opacity: 0.6; }
+        100% { top: 100%; opacity: 0; }
+    }
+    .luminous-active {
+        box-shadow: 0 0 20px 2px rgba(149, 211, 186, 0.2);
+        border-color: rgba(149, 211, 186, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+    }
 
-/* HERO */
-.hero{
-  padding:3rem 1.5rem 2.5rem;
-  position:relative;
-  overflow:hidden;
-}
-.hero-glow{
-  position:absolute;top:-60px;left:50%;transform:translateX(-50%);
-  width:320px;height:320px;
-  background:radial-gradient(circle,rgba(74,222,128,0.08) 0%,transparent 70%);
-  pointer-events:none;
-}
-.hero-pill{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--accent-dim);
-  border:1px solid rgba(74,222,128,0.2);
-  border-radius:99px;
-  padding:0.3rem 0.85rem;
-  font-size:0.73rem;
-  font-weight:600;
-  color:var(--accent);
-  letter-spacing:0.4px;
-  margin-bottom:1.4rem;
-}
-.pulse-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pd 2s infinite;}
-@keyframes pd{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(1.5);}}
-.hero h1{
-  font-family:'Outfit',sans-serif;
-  font-size:clamp(2rem,7vw,2.8rem);
-  font-weight:800;
-  line-height:1.1;
-  letter-spacing:-1.5px;
-  margin-bottom:0.9rem;
-  color:var(--text);
-}
-.hero h1 em{font-style:normal;color:var(--accent);}
-.hero p{
-  font-size:0.9rem;
-  line-height:1.75;
-  color:var(--muted2);
-  max-width:340px;
-  margin-bottom:2rem;
-}
-.stats-row{display:flex;gap:0;}
-.stat-item{
-  flex:1;
-  text-align:center;
-  padding:1rem 0;
-  border:1px solid var(--border);
-  background:var(--surface);
-}
-.stat-item:first-child{border-radius:12px 0 0 12px;}
-.stat-item:last-child{border-radius:0 12px 12px 0;}
-.stat-item:not(:first-child){border-left:none;}
-.stat-num{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--accent);}
-.stat-lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+    /* Global UI scale. Tailwind's spacing and type scales are rem-based, so the
+       whole desktop layout scales from this one number — raise it to zoom in,
+       lower it to fit more on screen. Phones stay at 100% for legibility. */
+    html { font-size: 93.75%; }
+    @media (min-width: 1024px) { html { font-size: 78.75%; } }
+    @media (min-width: 1600px) { html { font-size: 73%; } }
 
-/* MAIN */
-.main{flex:1;padding:0 1.2rem 100px;}
-.page{display:none;animation:fi 0.3s ease;}
-.page.active{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+    html, body { height: 100%; }
+    body {
+        background-color: #001a14;
+        overflow: hidden;
+        margin: 0;
+    }
+    #bg-shader-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+    #threejs-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-/* SCAN SECTION */
-.section-label{
-  font-size:0.7rem;font-weight:600;
-  text-transform:uppercase;letter-spacing:1.5px;
-  color:var(--muted);
-  margin-bottom:0.9rem;
-}
-.scan-stack{display:flex;flex-direction:column;gap:0.75rem;}
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
-/* PRIMARY BTN — full bleed gradient */
-.btn-scan{
-  width:100%;
-  border:none;
-  border-radius:14px;
-  padding:1.1rem 1.3rem;
-  display:flex;align-items:center;gap:1rem;
-  font-family:'DM Sans',sans-serif;
-  font-weight:600;
-  font-size:0.92rem;
-  cursor:pointer;
-  transition:transform 0.2s,box-shadow 0.2s;
-  text-align:left;
-  position:relative;
-  overflow:hidden;
-}
-.btn-scan:active{transform:scale(0.975);}
-.btn-primary{
-  background:linear-gradient(135deg,#4ade80 0%,#22c55e 100%);
-  color:#052e16;
-  box-shadow:0 4px 24px rgba(74,222,128,0.2);
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(74,222,128,0.35);}
-.btn-secondary{
-  background:var(--surface);
-  color:var(--text);
-  border:1px solid var(--border);
-}
-.btn-secondary:hover{border-color:rgba(74,222,128,0.3);background:var(--surface2);transform:translateY(-2px);}
-.btn-icon-wrap{
-  width:42px;height:42px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.btn-primary .btn-icon-wrap{background:rgba(5,46,22,0.25);}
-.btn-secondary .btn-icon-wrap{background:var(--accent-dim);}
-.btn-primary .btn-icon-wrap svg{stroke:#052e16;}
-.btn-secondary .btn-icon-wrap svg{stroke:var(--accent);}
-.btn-icon-wrap svg{width:20px;height:20px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.btn-label{font-size:0.92rem;font-weight:600;display:block;}
-.btn-sub{font-size:0.74rem;font-weight:400;opacity:0.65;display:block;margin-top:1px;}
+    /* logo.png is a fully opaque 827x388 image with a near-white background, so the
+       usual brightness(0) invert(1) white-out trick turned it into a blank white
+       block. It is shown in its own colours instead, as a rounded chip. */
+    .logo-chip {
+        border-radius: 18px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        outline: 1px solid rgba(255, 255, 255, 0.18);
+        outline-offset: -1px;
+    }
 
-/* BOTTOM NAV */
-.bottom-nav{
-  position:sticky;bottom:0;
-  background:rgba(12,12,15,0.95);
-  backdrop-filter:blur(24px);
-  border-top:1px solid var(--border);
-  display:flex;justify-content:space-around;
-  padding:0.55rem 0 calc(0.55rem + env(safe-area-inset-bottom));
-  z-index:100;
-}
-.nav-btn{
-  background:none;border:none;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:0.45rem 1.5rem;
-  color:var(--muted);
-  font-family:'DM Sans',sans-serif;
-  font-size:0.68rem;font-weight:500;
-  cursor:pointer;
-  transition:color 0.2s;
-  border-radius:10px;
-}
-.nav-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;margin-bottom:1px;}
-.nav-btn.active{color:var(--accent);}
-.nav-indicator{width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity 0.2s;}
-.nav-btn.active .nav-indicator{opacity:1;}
+    /* The pasted design used tailwindcss-animate classes (animate-in / slide-in-from-
+       bottom) which the Tailwind CDN build does not ship, so the entrance animation
+       never ran. These are the equivalent, done in plain CSS. */
+    @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    .rise { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .d1 { animation-delay: 0.10s; } .d2 { animation-delay: 0.15s; } .d3 { animation-delay: 0.20s; }
+    .d4 { animation-delay: 0.25s; } .d5 { animation-delay: 0.30s; } .d6 { animation-delay: 0.35s; }
 
-/* HISTORY */
-.history-wrap{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--surface);}
-.history-item{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1.1rem;border-bottom:1px solid var(--border);transition:background 0.15s;}
-.history-item:last-child{border-bottom:none;}
-.history-item:hover{background:var(--surface2);}
-.h-thumb{width:50px;height:50px;border-radius:9px;object-fit:cover;flex-shrink:0;}
-.h-crop{font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.h-meta{font-size:0.72rem;color:var(--muted);margin-top:2px;}
-.empty-state{padding:3rem 1rem;text-align:center;color:var(--muted);}
-.empty-state .e-icon{font-size:2rem;margin-bottom:0.75rem;opacity:0.4;}
-.empty-state p{font-size:0.85rem;line-height:1.6;}
-.section-heading{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--text);}
+    .lift { transition: transform .3s, border-color .3s; }
+    .lift:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.3); }
 
-/* RESULTS */
-.result-img{width:100%;height:220px;object-fit:cover;border-radius:16px;margin-bottom:1.1rem;}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.3rem;}
-.result-title{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:0.25rem;}
-.result-meta{font-size:0.82rem;color:var(--muted);margin-bottom:1rem;}
-.conf-track{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:1.2rem;}
-.conf-fill{height:100%;background:linear-gradient(90deg,var(--accent),#86efac);border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1);}
-.tabs{display:flex;gap:0.25rem;background:var(--surface2);border-radius:10px;padding:3px;margin-bottom:1.1rem;}
-.tab{flex:1;padding:0.55rem;border-radius:8px;text-align:center;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.2s;}
-.tab.active{background:var(--accent);color:#052e16;}
-.tab-content{display:none;font-size:0.875rem;line-height:1.8;color:var(--muted2);}
-.tab-content.active{display:block;animation:fi 0.2s ease;}
-.tab-content h3{font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:0.5rem;}
-.back-btn{
-  display:inline-flex;align-items:center;gap:0.4rem;
-  background:none;border:1px solid var(--border);
-  color:var(--muted2);border-radius:9px;
-  padding:0.45rem 0.9rem;
-  font-family:'DM Sans',sans-serif;font-size:0.82rem;
-  cursor:pointer;margin-bottom:1rem;
-  transition:border-color 0.2s,color 0.2s;
-}
-.back-btn:hover{border-color:rgba(74,222,128,0.3);color:var(--accent);}
+    .view { display: none; }
+    .view.active { display: block; }
+    .nav-item.active { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.10); }
+    .lang-btn.active { color: #b0f0d6; border-bottom: 2px solid rgba(176,240,214,0.5); }
 
-/* CAMERA MODAL */
-#camera-modal{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:200;display:none;justify-content:center;align-items:center;}
-#camera-view{position:relative;width:92%;max-width:430px;}
-#camera-stream{width:100%;border-radius:18px;}
-#capture-btn{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:62px;height:62px;border-radius:50%;border:3px solid rgba(255,255,255,0.8);background:var(--accent);cursor:pointer;box-shadow:0 0 24px var(--accent-glow);}
-#close-camera-btn{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-#file-input{display:none;}
-
-/* LOADER */
-.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:1rem;}
-.loader-ring{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loader p{font-size:0.88rem;color:var(--muted);}
+    /* Trend bars */
+    .trend-bar { transform-origin: bottom; transform: scaleY(0); transition: transform .8s cubic-bezier(0.16,1,0.3,1), filter .2s; }
+    .trend-bar.grown { transform: scaleY(1); }
+    .trend-bar:hover { filter: brightness(1.4); }
+    select option { background: #001a14; color: #fff; }
 </style>
 </head>
-<body>
-<div class="shell">
+<body class="text-white font-body-md">
 
-<header class="topbar">
-  <div class="wordmark"><span class="k">Karshak</span><span class="m">Mitra</span></div>
-  <select class="lang-select" id="language-selector">
-    <option value="en">English</option>
-    <option value="hi">हिन्दी</option>
-    <option value="te">తెలుగు</option>
-  </select>
-</header>
+<!-- 1. Background Shader Layer (Liquid Glass Base) -->
+<canvas id="bg-shader-layer"></canvas>
+<!-- 2. Three.js Glass Shards Layer -->
+<div id="threejs-container"></div>
 
-<section class="hero" id="hero-section">
-  <div class="hero-glow"></div>
-  <div class="hero-pill"><span class="pulse-dot"></span>AI · Real-Time</div>
-  <h1>Detect Crop<br>Disease <em>Instantly</em></h1>
-  <p>Snap a photo of any leaf. Our AI identifies the disease and gives you expert treatment advice in seconds.</p>
-  <div class="stats-row">
-    <div class="stat-item"><div class="stat-num">38+</div><div class="stat-lbl">Crops</div></div>
-    <div class="stat-item"><div class="stat-num">95%</div><div class="stat-lbl">Accuracy</div></div>
-    <div class="stat-item"><div class="stat-num">3s</div><div class="stat-lbl">Scan Time</div></div>
-  </div>
-</section>
+<div class="flex h-[100dvh] p-3 md:p-4 gap-4 relative z-10">
 
-<main class="main">
-  <div id="dashboard-page" class="page active">
-    <div class="section-label" data-key="new_scan">New Scan</div>
-    <div class="scan-stack">
-      <button id="camera-btn" class="btn-scan btn-primary">
-        <span class="btn-icon-wrap">
-          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="3"/><circle cx="12" cy="14" r="3"/><path d="M8 7l1.5-3h5L16 7"/></svg>
-        </span>
-        <span>
-          <span class="btn-label" data-key="live_camera">Live Camera</span>
-          <span class="btn-sub">Capture a photo now</span>
-        </span>
-      </button>
-      <button id="upload-btn" class="btn-scan btn-secondary">
-        <span class="btn-icon-wrap">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        </span>
-        <span>
-          <span class="btn-label" data-key="upload_image">Upload Image</span>
-          <span class="btn-sub">From your gallery</span>
-        </span>
-      </button>
-      <input type="file" id="file-input" accept="image/*">
+  <!-- Floating Glass Sidebar -->
+  <aside class="w-60 glass-panel backdrop-blur-3xl rounded-4xl flex-col p-4 hidden lg:flex shrink-0 lift">
+    <div class="mb-6 px-1">
+      <img alt="KarshakMitra" class="h-14 w-auto object-contain logo-chip" src="{{ url_for('static', filename='logo.png') }}"/>
     </div>
-  </div>
 
-  <div id="history-page" class="page">
-    <div class="section-heading" data-key="scan_history">Scan History</div>
-    <div class="history-wrap" id="history-list">
-      <div class="empty-state">
-        <div class="e-icon">🌿</div>
-        <p data-key="history_placeholder">Your last 5 scans will appear here.</p>
+    <nav class="flex-1 space-y-2">
+      <a class="nav-item active flex items-center gap-3 py-2.5 px-4 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent cursor-pointer" data-view="dashboard">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="font-semibold" data-key="nav_dashboard">Dashboard</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 py-2.5 px-4 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent cursor-pointer" data-view="scan">
+        <span class="material-symbols-outlined">document_scanner</span>
+        <span data-key="nav_scan">New Scan</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 py-2.5 px-4 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent cursor-pointer" data-view="history">
+        <span class="material-symbols-outlined">history</span>
+        <span data-key="nav_history">Scan History</span>
+      </a>
+      <a class="nav-item flex items-center gap-3 py-2.5 px-4 text-white/70 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent cursor-pointer" data-view="support">
+        <span class="material-symbols-outlined">support_agent</span>
+        <span data-key="nav_support">Support</span>
+      </a>
+    </nav>
+
+    <div class="pt-4 border-t border-white/10 mt-auto">
+      <div class="glass-panel-dark backdrop-blur-3xl p-3 rounded-3xl flex items-center gap-3">
+        <div class="w-9 h-9 rounded-[999px] bg-white/10 border border-white/30 flex items-center justify-center text-primary-fixed shrink-0">
+          <span class="material-symbols-outlined">agriculture</span>
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold text-sm truncate" data-key="user_name">Farmer</p>
+          <p class="text-[10px] text-white/50 truncate" data-key="user_role">Field Account</p>
+        </div>
       </div>
     </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col min-w-0 gap-6">
+
+    <!-- Top Glass Header -->
+    <header class="glass-panel backdrop-blur-3xl rounded-3xl h-14 px-4 md:px-6 flex justify-between items-center shrink-0 lift">
+      <div class="flex items-center gap-4 md:gap-8 min-w-0">
+        <div class="flex items-center gap-2 lg:hidden shrink-0">
+          <img alt="KarshakMitra" class="h-9 w-auto object-contain logo-chip" src="{{ url_for('static', filename='logo.png') }}"/>
+        </div>
+        <h2 class="font-title-md text-lg font-bold text-primary-fixed truncate hidden sm:block" id="page-title" data-key="title_dashboard">Dashboard</h2>
+        <div class="hidden md:flex gap-6 text-sm font-medium" id="lang-switch">
+          <button class="lang-btn active pb-1 transition-colors" data-lang="en">English</button>
+          <button class="lang-btn text-white/60 hover:text-white pb-1 transition-colors" data-lang="hi">हिन्दी</button>
+          <button class="lang-btn text-white/60 hover:text-white pb-1 transition-colors" data-lang="te">తెలుగు</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 md:gap-6 shrink-0">
+        <div class="hidden lg:flex items-center gap-2">
+          <span class="w-2 h-2 rounded-[999px] bg-primary-fixed animate-pulse"></span>
+          <span class="font-label-sm text-[10px] text-white/50 uppercase tracking-tighter" data-key="model_status">Model Online · 38 Classes</span>
+        </div>
+        <div class="h-8 w-[1px] bg-white/10 hidden lg:block"></div>
+        <select id="language-selector" class="md:hidden bg-white/5 border border-white/10 rounded-xl text-xs py-2 px-3 outline-none text-white">
+          <option value="en">EN</option>
+          <option value="hi">हि</option>
+          <option value="te">తె</option>
+        </select>
+        <button class="w-10 h-10 flex items-center justify-center rounded-[999px] hover:bg-white/10 transition-colors" title="Profile">
+          <span class="material-symbols-outlined">account_circle</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar pr-1 md:pr-2 pb-28 lg:pb-4">
+
+      <!-- ============================ DASHBOARD ============================ -->
+      <section id="view-dashboard" class="view active space-y-5">
+
+        <!-- Hero Bento -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+          <!-- Primary CTA -->
+          <div class="xl:col-span-8 glass-panel backdrop-blur-3xl rounded-4xl p-6 md:p-7 relative overflow-hidden min-h-[230px] flex flex-col justify-center rise lift">
+            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary-fixed/10 rounded-[999px] blur-[100px] pointer-events-none"></div>
+            <div class="relative z-10 max-w-lg">
+              <span class="inline-flex items-center gap-2 px-3 py-1 bg-primary-fixed/20 text-primary-fixed border border-primary-fixed/30 font-label-sm text-[10px] rounded-full mb-4">
+                <span class="w-2 h-2 bg-primary-fixed rounded-[999px] animate-pulse"></span>
+                <span id="model-badge">EFFICIENTNET · 38 CLASSES</span>
+              </span>
+              <h2 class="font-display-lg text-2xl lg:text-3xl font-black mb-3 leading-tight">
+                <span data-key="cta_title_1">Start AI</span><br/><span class="text-primary-fixed" data-key="cta_title_2">Diagnostic Scan</span>
+              </h2>
+              <p class="text-white/70 text-sm mb-6 leading-relaxed" data-key="cta_sub">
+                Photograph a single leaf and the model identifies the disease, then explains prevention and treatment.
+              </p>
+              <button id="launch-scanner" class="bg-primary-fixed text-on-primary-fixed px-6 py-3 rounded-2xl font-bold text-sm hover:brightness-110 hover:shadow-[0_0_30px_rgba(176,240,214,0.4)] transition-all active:scale-95 flex items-center gap-3">
+                <span class="material-symbols-outlined">center_focus_strong</span>
+                <span data-key="cta_button">Launch Scanner</span>
+              </button>
+            </div>
+            <div class="absolute right-0 top-0 bottom-0 w-1/3 hidden md:flex items-center justify-center pointer-events-none opacity-[0.07]">
+              <span class="material-symbols-outlined text-[150px] leading-none">eco</span>
+            </div>
+          </div>
+
+          <!-- Quick Upload -->
+          <div class="xl:col-span-4 glass-panel backdrop-blur-3xl rounded-4xl p-5 flex flex-col rise d2 lift">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-title-md text-base font-bold" data-key="quick_upload">Quick Upload</h3>
+              <span class="material-symbols-outlined text-white/40 text-[20px]" title="JPG or PNG, one leaf, daylight">info</span>
+            </div>
+            <div id="dropzone" class="flex-1 border-2 border-dashed border-white/20 rounded-3xl flex flex-col items-center justify-center p-5 text-center hover:border-primary-fixed/50 transition-all cursor-pointer group relative overflow-hidden bg-white/5">
+              <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110">
+                <span class="material-symbols-outlined text-2xl text-primary-fixed">upload_file</span>
+              </div>
+              <p class="font-bold text-sm mb-1" data-key="drop_title">Drag Leaf Images</p>
+              <p class="text-xs text-white/40" data-key="drop_sub">Supports JPG, PNG • Max 10MB</p>
+              <div class="mt-5 px-5 py-2.5 bg-white/10 group-hover:bg-primary-fixed group-hover:text-on-primary-fixed text-white text-sm font-bold rounded-xl transition-all w-full border border-white/10" data-key="drop_browse">
+                Browse Files
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 rise d3">
+          <div class="glass-panel backdrop-blur-3xl rounded-3xl p-4 flex items-center gap-4 lift">
+            <div class="w-12 h-12 bg-primary-fixed/20 text-primary-fixed rounded-2xl flex items-center justify-center border border-primary-fixed/20 shrink-0">
+              <span class="material-symbols-outlined text-xl">analytics</span>
+            </div>
+            <div>
+              <p class="text-[10px] text-white/50 tracking-widest uppercase font-bold mb-1" data-key="stat_total">Total Scans</p>
+              <h4 class="text-2xl font-black" id="stat-total">0</h4>
+            </div>
+          </div>
+          <div class="glass-panel backdrop-blur-3xl rounded-3xl p-4 flex items-center gap-4 lift">
+            <div class="w-12 h-12 bg-white/10 text-primary-fixed rounded-2xl flex items-center justify-center border border-white/10 shrink-0">
+              <span class="material-symbols-outlined text-xl">task_alt</span>
+            </div>
+            <div>
+              <p class="text-[10px] text-white/50 tracking-widest uppercase font-bold mb-1" data-key="stat_healthy">Healthy Crops</p>
+              <h4 class="text-2xl font-black text-primary-fixed" id="stat-healthy">—</h4>
+            </div>
+          </div>
+          <div class="glass-panel backdrop-blur-3xl rounded-3xl p-4 flex items-center gap-4 lift">
+            <div class="w-12 h-12 bg-secondary-container/20 text-secondary-container rounded-2xl flex items-center justify-center border border-secondary-container/20 shrink-0">
+              <span class="material-symbols-outlined text-xl">warning</span>
+            </div>
+            <div>
+              <p class="text-[10px] text-white/50 tracking-widest uppercase font-bold mb-1" data-key="stat_threats">Diseases Detected</p>
+              <h4 class="text-2xl font-black text-secondary-container" id="stat-threats">0</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trends & Insights -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 rise d4">
+          <div class="lg:col-span-8 glass-panel backdrop-blur-3xl rounded-4xl p-5 lift">
+            <div class="flex items-start justify-between mb-6 gap-4">
+              <div>
+                <h3 class="text-base font-bold mb-1" data-key="trend_title">Confidence by Scan</h3>
+                <p class="text-xs text-white/40" data-key="trend_sub">Model confidence per scan, oldest to newest</p>
+              </div>
+              <select id="trend-range" class="bg-white/5 border border-white/10 rounded-xl text-xs font-bold py-2 px-4 outline-none text-white shrink-0">
+                <option value="all">All time</option>
+                <option value="30">Last 30 Days</option>
+                <option value="7">Last 7 Days</option>
+              </select>
+            </div>
+            <div class="h-44 w-full relative" id="trend-chart">
+              <div class="absolute inset-0 flex flex-col justify-between border-b border-l border-white/10 pointer-events-none">
+                <div class="w-full h-[1px] bg-white/5"></div>
+                <div class="w-full h-[1px] bg-white/5"></div>
+                <div class="w-full h-[1px] bg-white/5"></div>
+              </div>
+              <div class="absolute inset-0 flex items-end justify-around gap-2 px-4 pb-8" id="trend-bars"></div>
+              <div class="absolute inset-0 hidden items-center justify-center text-center" id="trend-empty">
+                <p class="text-sm text-white/30" data-key="trend_empty">No scans yet — your confidence history will chart here.</p>
+              </div>
+              <div id="trend-tip" class="absolute hidden pointer-events-none z-20 px-3 py-2 rounded-xl glass-panel text-[11px] whitespace-nowrap"></div>
+            </div>
+            <div class="flex justify-between mt-6 text-white/30 text-[10px] font-bold uppercase tracking-widest" id="trend-axis"></div>
+          </div>
+
+          <div class="lg:col-span-4 flex flex-col gap-5">
+            <div class="glass-panel backdrop-blur-3xl rounded-4xl p-5 flex-1 lift">
+              <h3 class="text-base font-bold mb-4 flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary-container animate-pulse">bolt</span>
+                <span data-key="insights_title">Latest Findings</span>
+              </h3>
+              <div class="space-y-4" id="insights-list"></div>
+            </div>
+            <div class="glass-panel-dark backdrop-blur-3xl rounded-4xl p-5 border-secondary-container/20">
+              <p class="text-[10px] text-secondary-container font-black uppercase tracking-[0.2em] mb-3" data-key="tip_label">Field Tip</p>
+              <p class="text-white font-medium italic leading-relaxed" id="agro-tip"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Diagnostics -->
+        <div class="glass-panel backdrop-blur-3xl rounded-4xl overflow-hidden mb-4 rise d5 lift">
+          <div class="px-5 md:px-6 py-4 border-b border-white/10 flex items-center justify-between gap-4">
+            <h3 class="text-base font-black" data-key="recent_title">Recent Diagnostics</h3>
+            <button class="text-primary-fixed hover:text-white text-xs font-bold transition-colors shrink-0" data-goto="history" data-key="view_all">View All History</button>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left min-w-[720px]">
+              <thead class="bg-white/5 text-[10px] text-white/50 uppercase tracking-widest font-bold">
+                <tr>
+                  <th class="px-5 md:px-6 py-3" data-key="th_id">Sample ID</th>
+                  <th class="px-5 md:px-6 py-3" data-key="th_crop">Crop Type</th>
+                  <th class="px-5 md:px-6 py-3" data-key="th_issue">Issue</th>
+                  <th class="px-5 md:px-6 py-3" data-key="th_status">Status</th>
+                  <th class="px-5 md:px-6 py-3" data-key="th_conf">Confidence</th>
+                  <th class="px-5 md:px-6 py-3" data-key="th_action">Action</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm" id="recent-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ NEW SCAN ============================ -->
+      <section id="view-scan" class="view space-y-5">
+        <div class="glass-panel rounded-4xl p-6 md:p-7 relative overflow-hidden rise">
+          <div class="scan-line"></div>
+          <div class="absolute -right-10 -bottom-10 opacity-[0.07] pointer-events-none">
+            <span class="material-symbols-outlined text-[220px] leading-none">eco</span>
+          </div>
+          <div class="relative z-10">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-fixed/20 border border-primary-fixed/30 font-label-sm text-[10px] uppercase tracking-widest text-primary-fixed">
+              <span class="w-1.5 h-1.5 rounded-[999px] bg-primary-fixed animate-pulse"></span>
+              <span data-key="hero_pill">AI · Real-Time</span>
+            </span>
+            <h3 class="font-display-lg text-2xl md:text-3xl font-black mt-3 leading-[1.05] tracking-tight">
+              <span data-key="hero_title_1">Detect Crop Disease</span>
+              <span class="text-primary-fixed" data-key="hero_title_2">Instantly</span>
+            </h3>
+            <p class="text-sm md:text-base text-white/60 mt-4 max-w-lg leading-relaxed" data-key="hero_sub">
+              Snap a photo of any leaf. The model identifies the disease and gives you prevention and treatment advice in seconds.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 rise d2">
+          <button id="camera-btn" class="glass-panel rounded-3xl p-5 text-left flex items-center gap-4 lift group">
+            <div class="w-14 h-14 rounded-2xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0 shadow-lg group-hover:brightness-110 transition-all">
+              <span class="material-symbols-outlined">photo_camera</span>
+            </div>
+            <div>
+              <p class="font-title-md text-base font-bold" data-key="live_camera">Live Camera</p>
+              <p class="text-xs text-white/50 mt-0.5" data-key="live_camera_sub">Capture a leaf photo now</p>
+            </div>
+          </button>
+          <button id="upload-btn" class="glass-panel rounded-3xl p-5 text-left flex items-center gap-4 lift group">
+            <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 text-primary-fixed flex items-center justify-center shrink-0 group-hover:bg-white/20 transition-all">
+              <span class="material-symbols-outlined">image</span>
+            </div>
+            <div>
+              <p class="font-title-md text-base font-bold" data-key="upload_image">Upload Image</p>
+              <p class="text-xs text-white/50 mt-0.5" data-key="upload_image_sub">Choose from your gallery</p>
+            </div>
+          </button>
+          <input type="file" id="file-input" accept="image/*" class="hidden"/>
+        </div>
+      </section>
+
+      <!-- ============================ RESULTS ============================ -->
+      <section id="view-results" class="view space-y-6"></section>
+
+      <!-- ============================ HISTORY ============================ -->
+      <section id="view-history" class="view space-y-4">
+        <div class="glass-panel rounded-glass p-5 md:p-6 rise">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-5">
+            <div class="space-y-2">
+              <h2 class="font-display-lg text-2xl md:text-3xl font-black" data-key="scan_history">Scan History</h2>
+              <p class="text-sm text-white/70 max-w-md" data-key="history_sub">Review past diagnostic reports for your crops.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-4">
+              <div class="relative min-w-[260px] flex-1">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40">search</span>
+                <input id="history-search" class="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 focus:border-white/30 focus:ring-0 rounded-2xl text-white placeholder:text-white/30" placeholder="Search by crop or condition..." type="text"/>
+              </div>
+              <select id="history-filter" class="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/20 rounded-2xl font-label-sm text-xs text-white outline-none">
+                <option value="all">All results</option>
+                <option value="healthy">Healthy only</option>
+                <option value="disease">Diseases only</option>
+              </select>
+              <button id="export-csv" class="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-2xl transition-all font-label-sm text-xs shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-105">
+                <span class="material-symbols-outlined text-[18px]">export_notes</span>
+                <span data-key="export_csv">Export CSV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="history-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"></div>
+
+        <div class="flex justify-center pt-4 pb-4">
+          <button id="clear-history-btn" class="px-8 py-4 bg-white/5 hover:bg-error/20 hover:border-error/40 rounded-full font-label-sm text-xs text-white/60 hover:text-white border border-white/10 backdrop-blur-xl transition-all flex items-center gap-3">
+            <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+            <span data-key="clear_history">Clear History</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================ SUPPORT ============================ -->
+      <section id="view-support" class="view">
+        <div class="flex flex-col md:flex-row gap-gutter h-[calc(100dvh-13rem)] min-h-[520px]">
+          <!-- Assistant -->
+          <div class="flex-1 flex flex-col ultra-glass rounded-4xl overflow-hidden relative">
+            <div class="scan-line"></div>
+            <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02] shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-[999px] bg-primary-fixed/10 border border-primary-fixed/30 flex items-center justify-center text-primary-fixed shadow-lg">
+                  <span class="material-symbols-outlined">smart_toy</span>
+                </div>
+                <div>
+                  <h3 class="font-title-md text-base leading-none" data-key="assistant_name">KarshakMitra Assistant</h3>
+                  <div class="flex items-center gap-1 mt-1">
+                    <span class="w-2 h-2 rounded-[999px] bg-primary-fixed animate-pulse"></span>
+                    <span class="font-label-sm text-[10px] text-white/50 uppercase tracking-tighter" data-key="assistant_status">Offline guide · No internet needed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-6" id="chat-container"></div>
+            <div class="p-4 bg-white/[0.02] border-t border-white/10 shrink-0">
+              <div class="relative flex items-center">
+                <input id="chat-input" class="w-full bg-white/10 border border-white/20 focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed rounded-xl px-4 py-3 pr-14 text-sm outline-none text-white transition-all placeholder:text-white/20" placeholder="Ask about a disease, spraying, or prevention…" type="text"/>
+                <div class="absolute right-2 flex gap-1">
+                  <button id="chat-send" class="p-2 bg-primary-fixed text-on-primary-fixed rounded-lg shadow-lg hover:brightness-110 transition-all">
+                    <span class="material-symbols-outlined text-[20px]">send</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Experts -->
+          <aside class="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between">
+              <h4 class="font-title-md text-lg" data-key="experts_title">Agri Experts</h4>
+              <span class="font-label-sm text-[10px] bg-primary-fixed/20 text-primary-fixed px-2 py-0.5 rounded-full border border-primary-fixed/20">2 ONLINE</span>
+            </div>
+
+            <div class="ultra-glass p-4 rounded-3xl border-l-4 border-l-primary-fixed luminous-active">
+              <div class="flex gap-3">
+                <div class="relative shrink-0">
+                  <div class="w-14 h-14 rounded-[999px] bg-primary-container border-2 border-primary-fixed/40 flex items-center justify-center text-on-primary-container">
+                    <span class="material-symbols-outlined">potted_plant</span>
+                  </div>
+                  <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-[#001a14] rounded-[999px]"></div>
+                </div>
+                <div class="flex-1">
+                  <p class="font-label-sm text-xs font-bold" data-key="expert1_name">Kisan Call Centre</p>
+                  <p class="text-[11px] text-white/50 font-medium" data-key="expert1_role">Govt. helpline · 6 AM–10 PM</p>
+                  <a href="tel:18001801551" class="inline-flex items-center gap-1 mt-2 text-[11px] text-primary-fixed hover:brightness-125">
+                    <span class="material-symbols-outlined text-[14px]">call</span> 1800-180-1551
+                  </a>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="text-[9px] font-label-sm px-2 py-1 bg-white/10 rounded-md text-white/70">Free</span>
+                <span class="text-[9px] font-label-sm px-2 py-1 bg-white/10 rounded-md text-white/70">22 Languages</span>
+              </div>
+            </div>
+
+            <div class="ultra-glass p-4 rounded-3xl border border-white/5">
+              <div class="flex gap-3">
+                <div class="relative shrink-0">
+                  <div class="w-14 h-14 rounded-[999px] bg-white/10 border border-white/10 flex items-center justify-center text-primary-fixed">
+                    <span class="material-symbols-outlined">pest_control</span>
+                  </div>
+                  <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-[#001a14] rounded-[999px]"></div>
+                </div>
+                <div class="flex-1">
+                  <p class="font-label-sm text-xs font-bold text-white/90" data-key="expert2_name">Krishi Vigyan Kendra</p>
+                  <p class="text-[11px] text-white/50 font-medium" data-key="expert2_role">District extension centre</p>
+                  <p class="text-[11px] text-white/40 mt-2" data-key="expert2_note">Take your scan result to the nearest KVK for a field visit.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-auto p-4 bg-primary-fixed/10 backdrop-blur-3xl rounded-3xl border border-primary-fixed/20 relative overflow-hidden">
+              <div class="absolute -right-4 -bottom-4 opacity-10 pointer-events-none">
+                <span class="material-symbols-outlined text-8xl">help_center</span>
+              </div>
+              <h5 class="font-title-md text-base relative z-10 text-primary-fixed" data-key="tips_title">Better scans, better results</h5>
+              <p class="text-[11px] mt-2 relative z-10 text-white/60 leading-relaxed" data-key="tips_body">
+                Shoot a single leaf in daylight, fill the frame, and keep the background plain. Blurry or shaded photos lower confidence.
+              </p>
+              <button class="mt-4 w-full bg-primary-fixed text-on-primary-fixed font-bold font-label-sm text-xs py-2 rounded-lg hover:brightness-110 transition-all relative z-10 shadow-lg" data-goto="scan">
+                <span data-key="tips_cta">Start a Scan</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+    </main>
   </div>
+</div>
 
-  <div id="results-page" class="page"></div>
-</main>
+<!-- Floating Action Button -->
+<button id="fab-scan" class="hidden lg:flex fixed bottom-6 right-6 w-12 h-12 bg-primary-fixed text-on-primary-fixed rounded-[999px] shadow-[0_0_40px_rgba(176,240,214,0.4)] items-center justify-center hover:scale-110 transition-transform z-30" title="New scan">
+  <span class="material-symbols-outlined text-[22px]">add_a_photo</span>
+</button>
 
-<nav class="bottom-nav">
-  <button class="nav-btn active" data-page="dashboard-page" id="nav-home">
-    <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
-    <span data-key="nav_dashboard">Home</span>
-    <span class="nav-indicator"></span>
+<!-- Mobile Navigation Bar -->
+<nav class="lg:hidden fixed bottom-4 left-4 right-4 glass-panel backdrop-blur-3xl rounded-full flex justify-around py-3 px-2 z-50 shadow-2xl">
+  <button class="nav-item active flex flex-col items-center gap-1 text-white/50 px-3 py-1 rounded-2xl border border-transparent" data-view="dashboard">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[9px] font-bold uppercase tracking-widest" data-key="nav_home_short">Home</span>
   </button>
-  <button class="nav-btn" data-page="history-page" id="nav-history">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-    <span data-key="nav_history">History</span>
-    <span class="nav-indicator"></span>
+  <button class="nav-item flex flex-col items-center gap-1 text-white/50 px-3 py-1 rounded-2xl border border-transparent" data-view="scan">
+    <span class="material-symbols-outlined">document_scanner</span>
+    <span class="text-[9px] font-bold uppercase tracking-widest" data-key="nav_scan_short">Scan</span>
+  </button>
+  <button class="nav-item flex flex-col items-center gap-1 text-white/50 px-3 py-1 rounded-2xl border border-transparent" data-view="history">
+    <span class="material-symbols-outlined">history</span>
+    <span class="text-[9px] font-bold uppercase tracking-widest" data-key="nav_logs_short">Logs</span>
+  </button>
+  <button class="nav-item flex flex-col items-center gap-1 text-white/50 px-3 py-1 rounded-2xl border border-transparent" data-view="support">
+    <span class="material-symbols-outlined">support_agent</span>
+    <span class="text-[9px] font-bold uppercase tracking-widest" data-key="nav_chat_short">Chat</span>
   </button>
 </nav>
 
-</div>
-
-<div id="camera-modal">
-  <div id="camera-view">
-    <video id="camera-stream" autoplay playsinline></video>
-    <button id="capture-btn"></button>
-    <button id="close-camera-btn">✕</button>
+<!-- Camera modal -->
+<div id="camera-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/90 backdrop-blur-xl p-4">
+  <div class="relative w-full max-w-lg ultra-glass rounded-4xl overflow-hidden">
+    <div class="scan-line"></div>
+    <video id="camera-stream" autoplay playsinline class="w-full aspect-[3/4] sm:aspect-video object-cover bg-black"></video>
+    <button id="close-camera-btn" class="absolute top-3 right-3 w-9 h-9 rounded-[999px] bg-black/50 border border-white/10 text-white flex items-center justify-center hover:bg-black/80 transition-colors">
+      <span class="material-symbols-outlined text-[20px]">close</span>
+    </button>
+    <div class="absolute bottom-0 inset-x-0 p-5 flex justify-center bg-gradient-to-t from-black/70 to-transparent">
+      <button id="capture-btn" class="w-16 h-16 rounded-[999px] bg-primary-fixed border-4 border-white/70 shadow-[0_0_24px_rgba(176,240,214,0.5)] hover:brightness-110 active:scale-95 transition-all"></button>
+    </div>
   </div>
 </div>
 
+<!-- Background Animation Scripts -->
+<script>
+// 1. WebGL Shader Animation (Liquid Forest)
+(function initShader() {
+    const canvas = document.getElementById('bg-shader-layer');
+    const gl = canvas.getContext('webgl');
+    if (!gl) { document.body.style.background = 'linear-gradient(160deg,#003527,#00120e)'; return; }
+
+    const vsSource = `
+        attribute vec2 position;
+        varying vec2 v_texCoord;
+        void main() {
+            v_texCoord = position * 0.5 + 0.5;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
+
+    const fsSource = `
+        precision highp float;
+        varying vec2 v_texCoord;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+
+        vec3 colorA = vec3(0.0, 0.1, 0.08);
+        vec3 colorB = vec3(0.04, 0.25, 0.2);
+        vec3 colorC = vec3(0.2, 0.6, 0.45);
+
+        void main() {
+            vec2 uv = v_texCoord;
+            vec2 p = uv * 2.0 - 1.0;
+            p.x *= u_resolution.x / u_resolution.y;
+
+            float t = u_time * 0.3;
+
+            for(float i = 1.0; i < 5.0; i++) {
+                p.x += 0.4 / i * sin(i * 2.5 * p.y + t + u_mouse.x / u_resolution.x * 3.0);
+                p.y += 0.4 / i * cos(i * 2.5 * p.x + t + u_mouse.y / u_resolution.y * 3.0);
+            }
+
+            float noise = sin(p.x + p.y + t) * 0.5 + 0.5;
+            vec3 color = mix(colorA, colorB, noise);
+            color = mix(color, colorC, pow(noise, 8.0) * 0.4);
+
+            float shimmer = sin(p.x * 10.0 + p.y * 10.0 + t * 2.0) * 0.02;
+            color += shimmer;
+
+            float vignette = 1.0 - smoothstep(0.4, 1.6, length(v_texCoord - 0.5));
+            color *= vignette;
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
+
+    function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vsSource));
+    gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fsSource));
+    gl.linkProgram(program);
+
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+
+    const positionLocation = gl.getAttribLocation(program, 'position');
+    const timeLocation = gl.getUniformLocation(program, 'u_time');
+    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+
+    let mouse = { x: 0, y: 0 };
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+    function resizeShader() {
+        // Cap the drawing buffer on phones so the fragment shader stays cheap
+        const scale = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas.width = window.innerWidth * scale;
+        canvas.height = window.innerHeight * scale;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', resizeShader);
+    resizeShader();
+
+    function renderShader(time) {
+        gl.useProgram(program);
+        gl.enableVertexAttribArray(positionLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform1f(timeLocation, time * 0.001);
+        gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+        gl.uniform2f(mouseLocation, mouse.x, mouse.y);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        requestAnimationFrame(renderShader);
+    }
+    requestAnimationFrame(renderShader);
+})();
+
+// 2. Three.js Interactive Glass Shards
+(function initThreeJS() {
+    if (typeof THREE === 'undefined') return;
+    const container = document.getElementById('threejs-container');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const geometry = new THREE.ConeGeometry(0.15, 0.4, 4);
+    const material = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0.2,
+        roughness: 0.1,
+        transmission: 0.9,
+        thickness: 0.8,
+        transparent: true,
+        opacity: 0.35,
+        clearcoat: 1.0
+    });
+
+    // Fewer shards on phones — this layer is decorative, not worth the battery
+    const particlesCount = window.innerWidth < 768 ? 16 : 35;
+    const particles = [];
+
+    for (let i = 0; i < particlesCount; i++) {
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+            (Math.random() - 0.5) * 18,
+            (Math.random() - 0.5) * 18,
+            (Math.random() - 0.5) * 12
+        );
+        mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+        const scale = Math.random() * 2.5 + 0.8;
+        mesh.scale.set(scale, scale, scale);
+
+        mesh.userData = {
+            velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 0.008,
+                (Math.random() - 0.5) * 0.008,
+                (Math.random() - 0.5) * 0.008
+            ),
+            rotationSpeed: (Math.random() - 0.5) * 0.012
+        };
+
+        scene.add(mesh);
+        particles.push(mesh);
+    }
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    const spotLight = new THREE.SpotLight(0xb0f0d6, 5);
+    spotLight.position.set(10, 10, 10);
+    scene.add(spotLight);
+
+    camera.position.z = 6;
+
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (event) => {
+        mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+    });
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animateThree() {
+        requestAnimationFrame(animateThree);
+        particles.forEach(p => {
+            p.position.add(p.userData.velocity);
+            p.rotation.x += p.userData.rotationSpeed;
+            p.rotation.y += p.userData.rotationSpeed;
+            if (Math.abs(p.position.x) > 12) p.userData.velocity.x *= -1;
+            if (Math.abs(p.position.y) > 12) p.userData.velocity.y *= -1;
+            if (Math.abs(p.position.z) > 8) p.userData.velocity.z *= -1;
+        });
+        camera.position.x += (mouseX * 2.0 - camera.position.x) * 0.04;
+        camera.position.y += (-mouseY * 2.0 - camera.position.y) * 0.04;
+        camera.lookAt(scene.position);
+        renderer.render(scene, camera);
+    }
+    animateThree();
+})();
+</script>
+
+<!-- Application Logic -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const langSelector = document.getElementById('language-selector');
   const cameraModal = document.getElementById('camera-modal');
   const cameraStream = document.getElementById('camera-stream');
-  const captureBtn = document.getElementById('capture-btn');
-  const closeCameraBtn = document.getElementById('close-camera-btn');
   const fileInput = document.getElementById('file-input');
+  const chatContainer = document.getElementById('chat-container');
+  const langSelector = document.getElementById('language-selector');
 
+  const HISTORY_KEY = 'scanHistory';
+  const COUNT_KEY = 'scanCountTotal';
+  const HISTORY_CAP = 50;
+
+  /* ---------------- i18n ---------------- */
+  let currentLang = 'en';
   const translations = {
-    hi: { new_scan:"नया स्कैन", live_camera:"लाइव कैमरा", upload_image:"छवि अपलोड करें", scan_history:"स्कैन इतिहास", history_placeholder:"आपके अंतिम 5 स्कैन यहां दिखाई देंगे।", overview:"अवलोकन", prevention:"निवारण", treatment:"उपचार", description:"विवरण", prevention_steps:"निवारण चरण", treatment_advice:"उपचार सलाह", nav_dashboard:"होम", nav_history:"इतिहास" },
-    te: { new_scan:"కొత్త స్కాన్", live_camera:"లైవ్ కెమెరా", upload_image:"చిత్రం అప్‌లోడ్", scan_history:"స్కాన్ చరిత్ర", history_placeholder:"మీ చివరి 5 స్కాన్‌లు ఇక్కడ కనిపిస్తాయి.", overview:"అవలోకనం", prevention:"నివారణ", treatment:"చికిత్స", description:"వివరణ", prevention_steps:"నివారణ చర్యలు", treatment_advice:"చికిత్స సలహా", nav_dashboard:"హోమ్", nav_history:"చరిత్ర" }
+    hi: {
+      nav_dashboard:"डैशबोर्ड", nav_scan:"नया स्कैन", nav_history:"स्कैन इतिहास", nav_support:"सहायता",
+      nav_home_short:"होम", nav_scan_short:"स्कैन", nav_logs_short:"इतिहास", nav_chat_short:"चैट",
+      title_dashboard:"डैशबोर्ड", title_scan:"नया स्कैन", title_history:"स्कैन इतिहास", title_support:"सहायता केंद्र", title_results:"निदान परिणाम",
+      model_status:"मॉडल ऑनलाइन · 38 श्रेणियाँ",
+      cta_title_1:"एआई", cta_title_2:"निदान स्कैन शुरू करें",
+      cta_sub:"एक पत्ते की फोटो लें — मॉडल रोग पहचानकर बचाव और उपचार बताएगा।", cta_button:"स्कैनर खोलें",
+      quick_upload:"तुरंत अपलोड", drop_title:"पत्ते की छवि डालें", drop_sub:"JPG, PNG • अधिकतम 10MB", drop_browse:"फ़ाइल चुनें",
+      stat_total:"कुल स्कैन", stat_healthy:"स्वस्थ फसल", stat_threats:"रोग मिले",
+      trend_title:"प्रति स्कैन विश्वास", trend_sub:"पुराने से नए क्रम में मॉडल विश्वास", trend_empty:"अभी कोई स्कैन नहीं — यहाँ चार्ट दिखेगा।",
+      insights_title:"नवीनतम निष्कर्ष", tip_label:"खेत सुझाव",
+      recent_title:"हाल के निदान", view_all:"पूरा इतिहास देखें",
+      th_id:"नमूना आईडी", th_crop:"फसल", th_issue:"समस्या", th_status:"स्थिति", th_conf:"विश्वास", th_action:"क्रिया",
+      hero_pill:"एआई · रीयल-टाइम", hero_title_1:"फसल रोग पहचानें", hero_title_2:"तुरंत",
+      hero_sub:"किसी भी पत्ते की फोटो लें। मॉडल रोग पहचानकर कुछ ही सेकंड में बचाव और उपचार बताता है।",
+      live_camera:"लाइव कैमरा", live_camera_sub:"अभी फोटो लें", upload_image:"छवि अपलोड करें", upload_image_sub:"गैलरी से चुनें",
+      scan_history:"स्कैन इतिहास", history_sub:"अपनी फसलों की पिछली रिपोर्ट देखें।", export_csv:"CSV निर्यात", clear_history:"इतिहास मिटाएँ",
+      overview:"अवलोकन", prevention:"निवारण", treatment:"उपचार",
+      description:"विवरण", prevention_steps:"निवारण चरण", treatment_advice:"उपचार सलाह",
+      confidence:"विश्वास", crop:"फसल", back:"वापस", scan_again:"दोबारा स्कैन करें", analyzing:"आपकी फसल का विश्लेषण हो रहा है…",
+      healthy:"स्वस्थ", disease_detected:"रोग मिला",
+      assistant_name:"कर्षकमित्र सहायक", assistant_status:"ऑफ़लाइन गाइड · इंटरनेट की ज़रूरत नहीं",
+      experts_title:"कृषि विशेषज्ञ", expert1_name:"किसान कॉल सेंटर", expert1_role:"सरकारी हेल्पलाइन · सुबह 6 – रात 10",
+      expert2_name:"कृषि विज्ञान केंद्र", expert2_role:"जिला विस्तार केंद्र", expert2_note:"स्कैन परिणाम लेकर नज़दीकी केवीके जाएँ।",
+      tips_title:"बेहतर स्कैन, बेहतर परिणाम", tips_body:"दिन के उजाले में एक ही पत्ते की फोटो लें, फ्रेम भरें और पृष्ठभूमि सादी रखें।",
+      tips_cta:"स्कैन शुरू करें", user_name:"किसान", user_role:"फील्ड खाता"
+    },
+    te: {
+      nav_dashboard:"డాష్‌బోర్డ్", nav_scan:"కొత్త స్కాన్", nav_history:"స్కాన్ చరిత్ర", nav_support:"సహాయం",
+      nav_home_short:"హోమ్", nav_scan_short:"స్కాన్", nav_logs_short:"చరిత్ర", nav_chat_short:"చాట్",
+      title_dashboard:"డాష్‌బోర్డ్", title_scan:"కొత్త స్కాన్", title_history:"స్కాన్ చరిత్ర", title_support:"సహాయ కేంద్రం", title_results:"నిర్ధారణ ఫలితాలు",
+      model_status:"మోడల్ ఆన్‌లైన్ · 38 తరగతులు",
+      cta_title_1:"ఏఐ", cta_title_2:"నిర్ధారణ స్కాన్ ప్రారంభించండి",
+      cta_sub:"ఒక ఆకు ఫోటో తీయండి — మోడల్ వ్యాధిని గుర్తించి నివారణ, చికిత్స చెబుతుంది.", cta_button:"స్కానర్ తెరవండి",
+      quick_upload:"త్వరిత అప్‌లోడ్", drop_title:"ఆకు చిత్రాలను వదలండి", drop_sub:"JPG, PNG • గరిష్ఠం 10MB", drop_browse:"ఫైల్ ఎంచుకోండి",
+      stat_total:"మొత్తం స్కాన్‌లు", stat_healthy:"ఆరోగ్య పంటలు", stat_threats:"వ్యాధులు కనిపించాయి",
+      trend_title:"స్కాన్‌కు నమ్మకం", trend_sub:"పాతది నుండి కొత్తది వరకు మోడల్ నమ్మకం", trend_empty:"ఇంకా స్కాన్‌లు లేవు — ఇక్కడ చార్ట్ కనిపిస్తుంది.",
+      insights_title:"తాజా ఫలితాలు", tip_label:"క్షేత్ర సూచన",
+      recent_title:"ఇటీవలి నిర్ధారణలు", view_all:"పూర్తి చరిత్ర",
+      th_id:"నమూనా ఐడీ", th_crop:"పంట", th_issue:"సమస్య", th_status:"స్థితి", th_conf:"నమ్మకం", th_action:"చర్య",
+      hero_pill:"ఏఐ · రియల్-టైమ్", hero_title_1:"పంట వ్యాధిని గుర్తించండి", hero_title_2:"తక్షణమే",
+      hero_sub:"ఏదైనా ఆకు ఫోటో తీయండి. మోడల్ వ్యాధిని గుర్తించి క్షణాల్లో నివారణ, చికిత్స సలహా ఇస్తుంది.",
+      live_camera:"లైవ్ కెమెరా", live_camera_sub:"ఇప్పుడే ఫోటో తీయండి", upload_image:"చిత్రం అప్‌లోడ్", upload_image_sub:"గ్యాలరీ నుండి ఎంచుకోండి",
+      scan_history:"స్కాన్ చరిత్ర", history_sub:"మీ పంటల గత నిర్ధారణ రిపోర్టులను చూడండి.", export_csv:"CSV ఎగుమతి", clear_history:"చరిత్ర తొలగించు",
+      overview:"అవలోకనం", prevention:"నివారణ", treatment:"చికిత్స",
+      description:"వివరణ", prevention_steps:"నివారణ చర్యలు", treatment_advice:"చికిత్స సలహా",
+      confidence:"నమ్మకం", crop:"పంట", back:"వెనుకకు", scan_again:"మళ్లీ స్కాన్ చేయండి", analyzing:"మీ పంటను విశ్లేషిస్తోంది…",
+      healthy:"ఆరోగ్యం", disease_detected:"వ్యాధి కనిపించింది",
+      assistant_name:"కర్షకమిత్ర సహాయకుడు", assistant_status:"ఆఫ్‌లైన్ గైడ్ · ఇంటర్నెట్ అవసరం లేదు",
+      experts_title:"వ్యవసాయ నిపుణులు", expert1_name:"కిసాన్ కాల్ సెంటర్", expert1_role:"ప్రభుత్వ హెల్ప్‌లైన్ · ఉదయం 6 – రాత్రి 10",
+      expert2_name:"కృషి విజ్ఞాన కేంద్రం", expert2_role:"జిల్లా విస్తరణ కేంద్రం", expert2_note:"స్కాన్ ఫలితంతో దగ్గరి కేవీకేను సందర్శించండి.",
+      tips_title:"మంచి స్కాన్, మంచి ఫలితం", tips_body:"పగటి వెలుతురులో ఒకే ఆకును ఫ్రేమ్ నిండా తీయండి, నేపథ్యం సాదాగా ఉంచండి.",
+      tips_cta:"స్కాన్ ప్రారంభించండి", user_name:"రైతు", user_role:"ఫీల్డ్ ఖాతా"
+    }
   };
 
+  const t = (key) => (currentLang === 'en') ? null : (translations[currentLang]?.[key] || null);
+
   function setLanguage(lang) {
+    currentLang = lang;
     document.querySelectorAll('[data-key]').forEach(el => {
       if (!el.dataset.orig) el.dataset.orig = el.textContent;
       el.textContent = (lang === 'en') ? el.dataset.orig : (translations[lang]?.[el.dataset.key] || el.dataset.orig);
     });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      const on = b.dataset.lang === lang;
+      b.classList.toggle('active', on);
+      b.classList.toggle('text-white/60', !on);
+    });
+    if (langSelector.value !== lang) langSelector.value = lang;
+    renderDashboard();
+    renderHistory();
   }
+  document.querySelectorAll('[data-key]').forEach(el => el.dataset.orig = el.textContent);
+  document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLanguage(b.dataset.lang)));
   langSelector.addEventListener('change', e => setLanguage(e.target.value));
 
-  const navBtns = document.querySelectorAll('.nav-btn');
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
-    if (pageId !== 'results-page') document.getElementById('hero-section').style.display = '';
+  /* ---------------- Storage ---------------- */
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
   }
-  navBtns.forEach(btn => btn.addEventListener('click', () => {
-    showPage(btn.dataset.page);
-    if (btn.dataset.page === 'history-page') loadHistory();
-  }));
-
-  function loadHistory() {
-    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-    const list = document.getElementById('history-list');
-    if (!history.length) {
-      list.innerHTML = `<div class="empty-state"><div class="e-icon">🌿</div><p data-key="history_placeholder">Your last 5 scans will appear here.</p></div>`;
-      setLanguage(langSelector.value); return;
-    }
-    list.innerHTML = history.map(item => `
-      <div class="history-item">
-        <img src="${item.image}" class="h-thumb" alt="scan">
-        <div>
-          <div class="h-crop">${item.crop}: ${item.disease}</div>
-          <div class="h-meta">${new Date(item.date).toLocaleString()} · ${(item.confidence*100).toFixed(1)}% confidence</div>
-        </div>
-      </div>`).join('');
+  function getTotalCount() {
+    const stored = parseInt(localStorage.getItem(COUNT_KEY) || '0', 10);
+    // Older builds kept no lifetime counter, so fall back to what is stored.
+    return Number.isFinite(stored) && stored > 0 ? stored : getHistory().length;
   }
   function saveHistory(item) {
-    let h = JSON.parse(localStorage.getItem('scanHistory') || '[]');
-    h.unshift(item); h = h.slice(0, 5);
-    localStorage.setItem('scanHistory', JSON.stringify(h));
+    const total = getTotalCount() + 1;
+    localStorage.setItem(COUNT_KEY, String(total));
+    item.id = total;
+    let h = getHistory();
+    h.unshift(item);
+    h = h.slice(0, HISTORY_CAP);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+  const isHealthy = (item) => String(item.disease).toLowerCase().includes('healthy');
+  const sampleId = (item) => '#SCAN-' + String(item.id || 0).padStart(4, '0');
+
+  /* ---------------- View routing ---------------- */
+  const navItems = document.querySelectorAll('.nav-item');
+  const pageTitle = document.getElementById('page-title');
+  const titleKeys = { dashboard:'title_dashboard', scan:'title_scan', history:'title_history', support:'title_support', results:'title_results' };
+  const titleText = { dashboard:'Dashboard', scan:'New Scan', history:'Scan History', support:'Support Center', results:'Diagnosis Result' };
+  const mainScroll = document.querySelector('main');
+
+  function showView(view) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.view === view));
+    pageTitle.dataset.key = titleKeys[view];
+    pageTitle.dataset.orig = titleText[view];
+    pageTitle.textContent = t(titleKeys[view]) || titleText[view];
+    if (view === 'dashboard') renderDashboard();
+    if (view === 'history') renderHistory();
+    mainScroll.scrollTop = 0;
+  }
+  navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
+  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showView(b.dataset.goto)));
+  document.getElementById('fab-scan').addEventListener('click', () => showView('scan'));
+
+  /* ---------------- Dashboard ---------------- */
+  const FIELD_TIPS = [
+    "Shoot one leaf per photo in daylight — the model was trained on single-leaf images, and a whole plant lowers confidence.",
+    "Wipe dust off the leaf before photographing. Dust reads as spotting and can skew the diagnosis.",
+    "Spray in the early morning or evening, never in the midday sun, and always follow the label dose.",
+    "Photograph the worst-affected leaf, not the healthiest one — early lesions are what you want identified.",
+    "Rotate crops between seasons. It breaks the disease cycle for blights and leaf spots more reliably than any spray."
+  ];
+
+  function renderDashboard() {
+    const history = getHistory();
+    const total = getTotalCount();
+    const healthyCount = history.filter(isHealthy).length;
+    const diseaseCount = history.length - healthyCount;
+
+    document.getElementById('stat-total').textContent = total.toLocaleString();
+    document.getElementById('stat-healthy').textContent = history.length
+      ? ((healthyCount / history.length) * 100).toFixed(1) + '%' : '—';
+    document.getElementById('stat-threats').textContent = diseaseCount;
+
+    // Field tip: index derived from the day so it is stable within a session
+    const tipIdx = new Date().getDate() % FIELD_TIPS.length;
+    document.getElementById('agro-tip').textContent = '"' + FIELD_TIPS[tipIdx] + '"';
+
+    renderTrend(history);
+    renderInsights(history);
+    renderRecent(history);
   }
 
+  function renderTrend(history) {
+    const range = document.getElementById('trend-range').value;
+    const barsWrap = document.getElementById('trend-bars');
+    const empty = document.getElementById('trend-empty');
+    const axis = document.getElementById('trend-axis');
+    const tip = document.getElementById('trend-tip');
+
+    let rows = history.slice();
+    if (range !== 'all') {
+      const cutoff = Date.now() - Number(range) * 86400000;
+      rows = rows.filter(r => new Date(r.date).getTime() >= cutoff);
+    }
+    rows = rows.slice(0, 12).reverse(); // oldest -> newest
+
+    barsWrap.innerHTML = '';
+    axis.innerHTML = '';
+    if (!rows.length) {
+      empty.classList.remove('hidden');
+      empty.classList.add('flex');
+      return;
+    }
+    empty.classList.add('hidden');
+    empty.classList.remove('flex');
+
+    rows.forEach((row, i) => {
+      const pct = Math.max(4, Math.round(row.confidence * 100));
+      const healthy = isHealthy(row);
+      const bar = document.createElement('div');
+      // One measure (confidence) as height; status carries the two-state colour,
+      // and the tooltip names it in text so colour is never the only signal.
+      bar.className = 'trend-bar w-full max-w-[26px] rounded-t-lg cursor-pointer ' +
+        (healthy ? 'bg-primary-fixed/50' : 'bg-secondary-container/50');
+      bar.style.height = pct + '%';
+      bar.setAttribute('role', 'img');
+      bar.setAttribute('aria-label',
+        `${row.crop} ${row.disease}, ${(row.confidence * 100).toFixed(1)}% confidence`);
+      bar.addEventListener('mouseenter', () => {
+        tip.innerHTML =
+          `<span class="font-bold">${row.crop} · ${row.disease}</span><br>` +
+          `<span class="text-white/60">${(row.confidence * 100).toFixed(1)}% ${t('confidence') || 'confidence'} · ` +
+          `${new Date(row.date).toLocaleDateString()}</span>`;
+        tip.classList.remove('hidden');
+        const wrap = document.getElementById('trend-chart').getBoundingClientRect();
+        const b = bar.getBoundingClientRect();
+        tip.style.left = Math.min(Math.max(0, b.left - wrap.left - 60), wrap.width - 190) + 'px';
+        tip.style.top = Math.max(0, b.top - wrap.top - 52) + 'px';
+      });
+      bar.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+      bar.addEventListener('click', () => displayResults(row, row.image));
+      barsWrap.appendChild(bar);
+      requestAnimationFrame(() => setTimeout(() => bar.classList.add('grown'), i * 50));
+    });
+
+    const first = new Date(rows[0].date).toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+    const last = new Date(rows[rows.length - 1].date).toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+    axis.innerHTML = `<span>${first}</span><span>${rows.length} ${rows.length === 1 ? 'scan' : 'scans'}</span><span>${last}</span>`;
+  }
+  document.getElementById('trend-range').addEventListener('change', () => renderTrend(getHistory()));
+
+  function renderInsights(history) {
+    const list = document.getElementById('insights-list');
+    const diseased = history.filter(r => !isHealthy(r));
+
+    if (!history.length) {
+      list.innerHTML = `
+        <div class="p-4 bg-white/5 rounded-3xl border-l-4 border-white/20">
+          <p class="font-bold text-white/80 mb-1">No scans yet</p>
+          <p class="text-xs text-white/60 leading-relaxed">Run your first scan and findings from the model will appear here.</p>
+        </div>`;
+      return;
+    }
+
+    const latest = history[0];
+    const cards = [];
+    cards.push(`
+      <div class="p-5 bg-white/5 rounded-3xl border-l-4 ${isHealthy(latest) ? 'border-primary-fixed' : 'border-secondary-container'}">
+        <p class="font-bold ${isHealthy(latest) ? 'text-primary-fixed' : 'text-secondary-container'} mb-1 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px]">${isHealthy(latest) ? 'check_circle' : 'warning'}</span>
+          ${latest.crop} · ${latest.disease}
+        </p>
+        <p class="text-xs text-white/60 leading-relaxed">${latest.treatment}</p>
+      </div>`);
+
+    if (diseased.length > 1) {
+      const counts = {};
+      diseased.forEach(r => { counts[r.disease] = (counts[r.disease] || 0) + 1; });
+      const [name, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+      if (n > 1) {
+        cards.push(`
+          <div class="p-4 bg-white/5 rounded-3xl border-l-4 border-secondary-container">
+            <p class="font-bold text-secondary-container mb-1">Recurring: ${name}</p>
+            <p class="text-xs text-white/60 leading-relaxed">Detected in ${n} of your last ${history.length} scans. A repeat finding is worth showing to your local KVK.</p>
+          </div>`);
+      }
+    }
+    list.innerHTML = cards.join('');
+  }
+
+  function renderRecent(history) {
+    const body = document.getElementById('recent-body');
+    if (!history.length) {
+      body.innerHTML = `
+        <tr><td colspan="6" class="px-8 py-14 text-center">
+          <span class="material-symbols-outlined text-4xl text-primary-fixed/30">eco</span>
+          <p class="text-sm text-white/40 mt-2">No diagnostics yet. Launch a scan to fill this table.</p>
+        </td></tr>`;
+      return;
+    }
+    body.innerHTML = history.slice(0, 5).map((row, i) => {
+      const healthy = isHealthy(row);
+      const label = healthy ? (t('healthy') || 'Healthy') : (t('disease_detected') || 'Disease');
+      return `
+      <tr class="border-b border-white/5 hover:bg-white/10 transition-colors cursor-pointer ${i % 2 ? 'bg-white/[0.02]' : ''}" data-recent="${i}">
+        <td class="px-5 md:px-6 py-4 font-label-sm text-xs opacity-60">${sampleId(row)}</td>
+        <td class="px-5 md:px-6 py-4 font-semibold">${row.crop}</td>
+        <td class="px-5 md:px-6 py-4 text-white/70">${row.disease}</td>
+        <td class="px-5 md:px-6 py-4">
+          <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border inline-flex items-center gap-1
+            ${healthy ? 'bg-primary-fixed/20 text-primary-fixed border-primary-fixed/20' : 'bg-secondary-container/20 text-secondary-container border-secondary-container/20'}">
+            <span class="material-symbols-outlined text-[13px]">${healthy ? 'check_circle' : 'warning'}</span>${label}
+          </span>
+        </td>
+        <td class="px-5 md:px-6 py-4 font-label-sm text-primary-fixed">${(row.confidence * 100).toFixed(1)}%</td>
+        <td class="px-5 md:px-6 py-4">
+          <span class="w-8 h-8 rounded-[999px] bg-white/10 flex items-center justify-center hover:bg-primary-fixed hover:text-on-primary-fixed transition-all">
+            <span class="material-symbols-outlined text-lg">description</span>
+          </span>
+        </td>
+      </tr>`;
+    }).join('');
+
+    body.querySelectorAll('[data-recent]').forEach(tr => {
+      tr.addEventListener('click', () => {
+        const item = getHistory()[Number(tr.dataset.recent)];
+        if (item) displayResults(item, item.image);
+      });
+    });
+  }
+
+  /* ---------------- History (card grid) ---------------- */
+  function renderHistory() {
+    const grid = document.getElementById('history-grid');
+    const q = (document.getElementById('history-search').value || '').toLowerCase().trim();
+    const filter = document.getElementById('history-filter').value;
+    let rows = getHistory();
+
+    if (filter === 'healthy') rows = rows.filter(isHealthy);
+    if (filter === 'disease') rows = rows.filter(r => !isHealthy(r));
+    if (q) rows = rows.filter(r => (r.crop + ' ' + r.disease).toLowerCase().includes(q));
+
+    if (!rows.length) {
+      grid.innerHTML = `
+        <div class="md:col-span-2 lg:col-span-3 glass-panel rounded-glass py-16 px-6 text-center">
+          <span class="material-symbols-outlined text-5xl text-primary-fixed/40">eco</span>
+          <p class="text-sm text-white/40 mt-3">${getHistory().length ? 'No scans match your search.' : (t('trend_empty') || 'No scans yet — your history will appear here.')}</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = rows.map((row, i) => {
+      const healthy = isHealthy(row);
+      const label = healthy ? (t('healthy') || 'Healthy') : (t('disease_detected') || 'Disease Detected');
+      const glow = healthy ? '34, 197, 94' : '254, 147, 44';
+      const dot = healthy ? 'bg-green-500' : 'bg-secondary-container';
+      const chip = healthy
+        ? 'bg-green-500/20 text-green-300 border-green-500/30'
+        : 'bg-secondary-container/20 text-secondary-container border-secondary-container/30';
+      return `
+      <div class="glass-card rounded-glass p-6 flex flex-col gap-6 rise d${Math.min(i + 1, 6)}" data-hist="${i}">
+        <div class="flex justify-between items-start gap-3">
+          <div class="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+            <img alt="" class="w-full h-full object-cover" src="${row.image}"/>
+          </div>
+          <span class="px-3 py-1.5 rounded-full font-label-sm text-[10px] border status-glow flex items-center gap-2 ${chip}" style="--glow-color: ${glow};">
+            <span class="w-2 h-2 rounded-[999px] ${dot}"></span>${label}
+          </span>
+        </div>
+        <div>
+          <h3 class="font-title-md text-lg font-bold">${row.crop}</h3>
+          <p class="text-sm text-white/70 font-semibold">${row.disease}</p>
+          <p class="font-label-sm text-[10px] text-white/40 mt-1 uppercase tracking-widest">
+            ${sampleId(row)} · ${new Date(row.date).toLocaleDateString()} · ${(row.confidence * 100).toFixed(1)}%
+          </p>
+        </div>
+        <div class="mt-auto">
+          <button class="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 transition-all rounded-2xl font-label-sm text-xs flex items-center justify-center gap-3 group">
+            View Full Report
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+    grid.querySelectorAll('[data-hist]').forEach(card => {
+      card.addEventListener('click', () => {
+        const item = rows[Number(card.dataset.hist)];
+        if (item) displayResults(item, item.image);
+      });
+    });
+  }
+  document.getElementById('history-search').addEventListener('input', renderHistory);
+  document.getElementById('history-filter').addEventListener('change', renderHistory);
+  document.getElementById('clear-history-btn').addEventListener('click', () => {
+    if (!confirm('Delete all saved scans from this device?')) return;
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+    renderDashboard();
+  });
+
+  document.getElementById('export-csv').addEventListener('click', () => {
+    const rows = getHistory();
+    if (!rows.length) { alert('No scans to export yet.'); return; }
+    const esc = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+    const csv = [
+      ['Sample ID', 'Date', 'Crop', 'Diagnosis', 'Confidence', 'Status', 'Treatment'].join(','),
+      ...rows.map(r => [
+        sampleId(r), new Date(r.date).toISOString(), r.crop, r.disease,
+        (r.confidence * 100).toFixed(2) + '%', isHealthy(r) ? 'Healthy' : 'Disease', r.treatment
+      ].map(esc).join(','))
+    ].join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'karshakmitra-scans.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ---------------- Camera & upload ---------------- */
   let stream;
-  document.getElementById('camera-btn').addEventListener('click', async () => {
+  function closeCamera() {
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    stream = null;
+    cameraModal.classList.add('hidden');
+    cameraModal.classList.remove('flex');
+  }
+  async function openCamera() {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment' } });
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       cameraStream.srcObject = stream;
-      cameraModal.style.display = 'flex';
+      cameraModal.classList.remove('hidden');
+      cameraModal.classList.add('flex');
     } catch { alert('Camera permission denied.'); }
-  });
-  closeCameraBtn.addEventListener('click', () => {
-    if (stream) stream.getTracks().forEach(t => t.stop());
-    cameraModal.style.display = 'none';
-  });
-  captureBtn.addEventListener('click', () => {
+  }
+  document.getElementById('camera-btn').addEventListener('click', openCamera);
+  document.getElementById('launch-scanner').addEventListener('click', openCamera);
+  document.getElementById('close-camera-btn').addEventListener('click', closeCamera);
+  document.getElementById('capture-btn').addEventListener('click', () => {
     const canvas = document.createElement('canvas');
-    canvas.width = cameraStream.videoWidth; canvas.height = cameraStream.videoHeight;
+    canvas.width = cameraStream.videoWidth;
+    canvas.height = cameraStream.videoHeight;
     canvas.getContext('2d').drawImage(cameraStream, 0, 0);
     canvas.toBlob(blob => handleFile(blob), 'image/jpeg');
-    closeCameraBtn.click();
+    closeCamera();
   });
   document.getElementById('upload-btn').addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  fileInput.addEventListener('change', e => { handleFile(e.target.files[0]); fileInput.value = ''; });
+
+  const dropzone = document.getElementById('dropzone');
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropzone.classList.add('bg-white/10', 'border-primary-fixed');
+  });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('bg-white/10', 'border-primary-fixed'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('bg-white/10', 'border-primary-fixed');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  /* ---------------- Prediction flow ---------------- */
+  let lastResult = null;
 
   async function handleFile(file) {
     if (!file) return;
-    document.getElementById('hero-section').style.display = 'none';
-    showPage('results-page');
-    document.getElementById('results-page').innerHTML = `<div class="loader"><div class="loader-ring"></div><p>Analyzing your crop…</p></div>`;
+    showView('results');
+    document.getElementById('view-results').innerHTML = `
+      <div class="glass-panel rounded-4xl p-16 flex flex-col items-center justify-center gap-5 relative overflow-hidden">
+        <div class="scan-line"></div>
+        <div class="w-12 h-12 rounded-[999px] border-2 border-white/10 border-t-primary-fixed animate-spin"></div>
+        <p class="font-label-sm text-xs uppercase tracking-widest text-white/50">${t('analyzing') || 'Analyzing your crop…'}</p>
+      </div>`;
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async () => {
@@ -425,55 +1323,223 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData();
       formData.append('file', file);
       try {
-        const res = await fetch('/predict', { method:'POST', body:formData });
+        const res = await fetch('/predict', { method: 'POST', body: formData });
         const data = await res.json();
         if (data.error) throw new Error(data.error);
-        displayResults(data, imageDataUrl);
-        saveHistory({...data, image:imageDataUrl, date:new Date()});
-      } catch {
-        alert('Prediction failed. Please try again.');
-        document.getElementById('hero-section').style.display = '';
-        showPage('dashboard-page');
+        const item = { ...data, image: imageDataUrl, date: new Date().toISOString() };
+        saveHistory(item);
+        displayResults(item, imageDataUrl);
+      } catch (err) {
+        alert('Prediction failed: ' + (err.message || 'please try again.'));
+        showView('scan');
       }
     };
   }
 
   function displayResults(data, imageUrl) {
+    lastResult = data;
+    showView('results');
     const pct = (data.confidence * 100).toFixed(1);
-    const healthy = data.disease.toLowerCase().includes('healthy');
-    document.getElementById('results-page').innerHTML = `
-      <button class="back-btn" id="back-btn">← Back</button>
-      <img src="${imageUrl}" class="result-img" alt="crop">
-      <div class="result-card">
-        <div class="result-title">${healthy ? '✅' : '⚠️'} ${data.disease}</div>
-        <div class="result-meta">Crop: <strong style="color:var(--text)">${data.crop}</strong> &nbsp;·&nbsp; Confidence: <strong style="color:var(--accent)">${pct}%</strong></div>
-        <div class="conf-track"><div class="conf-fill" style="width:${pct}%"></div></div>
-        <div class="tabs">
-          <div class="tab active" data-tab="ov" data-key="overview">Overview</div>
-          <div class="tab" data-tab="pv" data-key="prevention">Prevention</div>
-          <div class="tab" data-tab="tr" data-key="treatment">Treatment</div>
+    const healthy = isHealthy(data);
+    const accent = healthy ? 'text-primary-fixed' : 'text-secondary-container';
+    const barColor = healthy ? 'bg-primary-fixed' : 'bg-secondary-container';
+
+    document.getElementById('view-results').innerHTML = `
+      <div class="flex items-center justify-between rise">
+        <button id="back-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl glass-panel text-white/70 hover:text-white hover:bg-white/10 transition-all font-label-sm text-xs">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>${t('back') || 'Back'}
+        </button>
+        <button id="support-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl glass-panel text-primary-fixed hover:bg-white/10 transition-all font-label-sm text-xs">
+          <span class="material-symbols-outlined text-[18px]">support_agent</span>${t('nav_support') || 'Support'}
+        </button>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-gutter rise d2">
+        <div class="lg:w-[380px] shrink-0">
+          <div class="glass-panel rounded-4xl p-3 relative overflow-hidden">
+            <div class="scan-line"></div>
+            <img src="${imageUrl}" alt="" class="w-full aspect-square object-cover rounded-3xl"/>
+          </div>
         </div>
-        <div id="ov" class="tab-content active"><h3 data-key="description">Description</h3><p>${data.description}</p></div>
-        <div id="pv" class="tab-content"><h3 data-key="prevention_steps">Prevention Steps</h3><p>${data.prevention}</p></div>
-        <div id="tr" class="tab-content"><h3 data-key="treatment_advice">Treatment Advice</h3><p>${data.treatment}</p></div>
+
+        <div class="flex-1 glass-panel rounded-4xl p-6 md:p-8">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border font-label-sm text-[10px] uppercase tracking-widest
+            ${healthy ? 'bg-primary-fixed/20 border-primary-fixed/30 text-primary-fixed' : 'bg-secondary-container/20 border-secondary-container/30 text-secondary-container'}">
+            <span class="material-symbols-outlined text-[14px]">${healthy ? 'check_circle' : 'warning'}</span>
+            ${healthy ? (t('healthy') || 'Healthy') : (t('disease_detected') || 'Disease Detected')}
+          </span>
+
+          <h3 class="font-display-lg text-3xl md:text-4xl font-black mt-4 tracking-tight">${data.disease}</h3>
+          <p class="text-sm text-white/50 mt-1">${t('crop') || 'Crop'}: <span class="text-white/80 font-medium">${data.crop}</span>
+            <span class="opacity-40"> · ${sampleId(data)}</span></p>
+
+          <div class="mt-6">
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="font-label-sm text-[10px] uppercase tracking-widest text-white/40">${t('confidence') || 'Confidence'}</span>
+              <span class="font-display-lg text-2xl font-black ${accent}">${pct}%</span>
+            </div>
+            <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full transition-all duration-1000" style="width:0%" id="conf-bar"></div>
+            </div>
+          </div>
+
+          <div class="flex gap-1 bg-white/5 border border-white/10 rounded-xl p-1 mt-7">
+            <button class="tab flex-1 py-2 rounded-lg font-label-sm text-[11px] uppercase tracking-wider transition-all bg-primary-fixed text-on-primary-fixed" data-tab="ov">${t('overview') || 'Overview'}</button>
+            <button class="tab flex-1 py-2 rounded-lg font-label-sm text-[11px] uppercase tracking-wider transition-all text-white/50 hover:text-white" data-tab="pv">${t('prevention') || 'Prevention'}</button>
+            <button class="tab flex-1 py-2 rounded-lg font-label-sm text-[11px] uppercase tracking-wider transition-all text-white/50 hover:text-white" data-tab="tr">${t('treatment') || 'Treatment'}</button>
+          </div>
+
+          <div class="mt-5 min-h-[110px]">
+            <div id="tab-ov" class="tab-body">
+              <h4 class="font-label-sm text-[10px] uppercase tracking-widest text-primary-fixed mb-2">${t('description') || 'Description'}</h4>
+              <p class="text-sm leading-relaxed text-white/70">${data.description}</p>
+            </div>
+            <div id="tab-pv" class="tab-body hidden">
+              <h4 class="font-label-sm text-[10px] uppercase tracking-widest text-primary-fixed mb-2">${t('prevention_steps') || 'Prevention Steps'}</h4>
+              <p class="text-sm leading-relaxed text-white/70">${data.prevention}</p>
+            </div>
+            <div id="tab-tr" class="tab-body hidden">
+              <h4 class="font-label-sm text-[10px] uppercase tracking-widest text-primary-fixed mb-2">${t('treatment_advice') || 'Treatment Advice'}</h4>
+              <p class="text-sm leading-relaxed text-white/70">${data.treatment}</p>
+            </div>
+          </div>
+
+          <button id="rescan-btn" class="mt-7 w-full bg-primary-fixed text-on-primary-fixed font-bold font-label-sm text-xs py-3 rounded-xl hover:brightness-110 transition-all shadow-lg">
+            ${t('scan_again') || 'Scan Another Leaf'}
+          </button>
+        </div>
       </div>`;
-    document.getElementById('back-btn').addEventListener('click', () => {
-      document.getElementById('hero-section').style.display = '';
-      showPage('dashboard-page');
+
+    requestAnimationFrame(() => {
+      const bar = document.getElementById('conf-bar');
+      if (bar) bar.style.width = pct + '%';
     });
-    document.querySelectorAll('#results-page .tab').forEach(tab => {
+
+    document.getElementById('back-btn').addEventListener('click', () => showView('dashboard'));
+    document.getElementById('rescan-btn').addEventListener('click', () => showView('scan'));
+    document.getElementById('support-btn').addEventListener('click', () => {
+      showView('support');
+      pushAssistantMessage(assistantReply('result'));
+    });
+
+    document.querySelectorAll('#view-results .tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('#results-page .tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('#results-page .tab-content').forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
+        document.querySelectorAll('#view-results .tab').forEach(other => {
+          other.classList.remove('bg-primary-fixed', 'text-on-primary-fixed');
+          other.classList.add('text-white/50', 'hover:text-white');
+        });
+        tab.classList.add('bg-primary-fixed', 'text-on-primary-fixed');
+        tab.classList.remove('text-white/50', 'hover:text-white');
+        document.querySelectorAll('#view-results .tab-body').forEach(b => b.classList.add('hidden'));
+        document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
       });
     });
-    setLanguage(langSelector.value);
   }
 
-  loadHistory();
-  document.querySelectorAll('[data-key]').forEach(el => el.dataset.orig = el.textContent);
+  /* ---------------- Offline assistant ----------------
+     No chat backend exists, so this answers from the last scan and a small
+     keyword guide. It never claims to be a live expert. */
+  const timeStamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  function pushMessage(text, who) {
+    const wrap = document.createElement('div');
+    if (who === 'user') {
+      wrap.className = 'flex gap-4 max-w-[85%] ml-auto flex-row-reverse';
+      wrap.innerHTML = `
+        <div class="shrink-0 w-8 h-8 rounded-[999px] bg-secondary flex items-center justify-center text-white mt-1">
+          <span class="material-symbols-outlined text-sm">person</span>
+        </div>
+        <div class="bg-primary/40 p-4 rounded-3xl rounded-tr-none shadow-md border border-white/10 backdrop-blur-md">
+          <p class="text-sm">${text}</p>
+          <span class="text-[10px] text-white/40 mt-2 block font-label-sm">${timeStamp()}</span>
+        </div>`;
+    } else {
+      wrap.className = 'flex gap-4 max-w-[85%]';
+      wrap.innerHTML = `
+        <div class="shrink-0 w-8 h-8 rounded-[999px] bg-primary-container flex items-center justify-center text-on-primary-container mt-1">
+          <span class="material-symbols-outlined text-sm">robot_2</span>
+        </div>
+        <div class="chat-bubble-ai p-4 rounded-3xl rounded-tl-none shadow-sm text-white/90">
+          <p class="text-sm leading-relaxed">${text}</p>
+          <span class="text-[10px] text-white/30 mt-2 block font-label-sm">${timeStamp()}</span>
+        </div>`;
+    }
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(15px)';
+    chatContainer.appendChild(wrap);
+    requestAnimationFrame(() => {
+      wrap.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'translateY(0)';
+    });
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function pushAssistantMessage(text) {
+    const typing = document.createElement('div');
+    typing.className = 'flex gap-4';
+    typing.innerHTML = `
+      <div class="shrink-0 w-8 h-8 rounded-[999px] bg-primary-fixed/20 flex items-center justify-center text-primary-fixed">
+        <span class="material-symbols-outlined text-sm">pending</span>
+      </div>
+      <div class="bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 flex items-center gap-2">
+        <span class="w-1.5 h-1.5 bg-primary-fixed rounded-[999px] animate-bounce"></span>
+        <span class="w-1.5 h-1.5 bg-primary-fixed rounded-[999px] animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1.5 h-1.5 bg-primary-fixed rounded-[999px] animate-bounce [animation-delay:0.4s]"></span>
+      </div>`;
+    chatContainer.appendChild(typing);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    setTimeout(() => { typing.remove(); pushMessage(text, 'ai'); }, 700);
+  }
+
+  function assistantReply(input) {
+    const q = String(input).toLowerCase();
+    const last = lastResult || getHistory()[0];
+
+    if (q === 'result' && last) {
+      return `Your last scan came back as <strong class="text-primary-fixed">${last.crop} — ${last.disease}</strong> at ${(last.confidence*100).toFixed(1)}% confidence.<br><br><strong>Treatment:</strong> ${last.treatment}<br><br>If symptoms spread after a week, call the Kisan Call Centre on 1800-180-1551.`;
+    }
+    if (/(last|recent|my) ?(scan|result|diagnos)/.test(q)) {
+      return last
+        ? `Your most recent scan: <strong class="text-primary-fixed">${last.crop} — ${last.disease}</strong> (${(last.confidence*100).toFixed(1)}% confidence).<br><br>${last.description}`
+        : `You have not scanned a leaf yet. Open <strong>New Scan</strong> and photograph a single leaf in daylight.`;
+    }
+    if (/prevent|avoid|stop/.test(q)) {
+      return last ? `<strong>Prevention for ${last.disease}:</strong><br>${last.prevention}`
+        : `General prevention: rotate crops each season, space plants for airflow, water at the base rather than overhead, and remove infected leaves from the field.`;
+    }
+    if (/treat|spray|fungicide|medicine|cure|dawa/.test(q)) {
+      return last
+        ? `<strong>Treatment for ${last.disease}:</strong><br>${last.treatment}<br><br>Spray in the early morning or evening, never in the midday sun, and follow the label dose.`
+        : `Scan a leaf first so I can give a specific treatment. As a rule, spray in the cool part of the day and follow the label dose exactly.`;
+    }
+    if (/photo|picture|image|blur|camera|scan/.test(q)) {
+      return `For a reliable scan: one leaf per photo, daylight, plain background, leaf filling most of the frame, and hold steady until focus locks.`;
+    }
+    if (/expert|officer|call|help|phone|contact/.test(q)) {
+      return `Kisan Call Centre is free on <strong class="text-primary-fixed">1800-180-1551</strong> (6 AM–10 PM). For a field visit, take your scan result to the nearest Krishi Vigyan Kendra.`;
+    }
+    if (/^(hi|hello|namaste|hey)\b/.test(q)) {
+      return `Namaste. I can explain your scan result, prevention steps, treatment, or how to take a better photo. What do you need?`;
+    }
+    return `I answer from your scan results and a built-in crop guide, so I only cover diseases, prevention, treatment, and photo tips. For anything beyond that, call the Kisan Call Centre on <strong class="text-primary-fixed">1800-180-1551</strong>.`;
+  }
+
+  const chatInput = document.getElementById('chat-input');
+  function sendChat() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    pushMessage(text.replace(/</g, '&lt;'), 'user');
+    chatInput.value = '';
+    pushAssistantMessage(assistantReply(text));
+  }
+  document.getElementById('chat-send').addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  /* ---------------- Boot ---------------- */
+  pushMessage('Namaste. Scan a leaf and I will explain the diagnosis, or ask me about prevention, treatment, or taking a good photo.', 'ai');
+  renderDashboard();
+  renderHistory();
 });
 </script>
 </body>

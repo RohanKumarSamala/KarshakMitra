@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarshakMitra Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <style>
+         :root {
+            --primary: #2ECC71;
+            --bg-light: #F4F7FC;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A202C;
+            --text-light: #5A6474;
+            --border: #E2E8F0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .main-content {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+        
+        .card h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .language-selector {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-family: inherit;
+        }
+        
+        .weather-card .risk {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn i {
+            font-size: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--border);
+            color: var(--text-dark);
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        img.history-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .history-item .info .disease {
+            font-weight: 600;
+        }
+        
+        .history-item .info .date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        #camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #camera-view {
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        #camera-stream {
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        #capture-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background-color: var(--primary);
+        }
+        
+        #close-camera-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        #results-page .result-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+        
+        #results-page .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        
+        #results-page .tab {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        #results-page .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        #results-page .tab-content {
+            display: none;
+        }
+        
+        #results-page .tab-content.active {
+            display: block;
+        }
+        
+        #results-page .tab-content h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-white);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            width: 33.33%;
+            cursor: pointer;
+        }
+        
+        .nav-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .nav-btn.active {
+            color: var(--primary);
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .loader {
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main-content">
+        <div id="dashboard-page" class="page active">
+            <div class="header">
+                <h1 data-key="dashboard_title">Dashboard</h1>
+                <select class="language-selector" id="language-selector">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                </select>
+            </div>
+            <div class="card weather-card">
+                <h2 data-key="local_conditions">Local Conditions</h2>
+                <p id="weather-info">Fetching weather data...</p>
+                <p class="risk" id="disease-risk">Calculating risk...</p>
+            </div>
+            <div class="card actions-card">
+                <h2 data-key="new_scan">Start a New Scan</h2>
+                <div class="btn-grid">
+                    <button id="camera-btn" class="btn btn-primary"><i class="ph-camera"></i><span data-key="live_camera">Live Camera</span></button>
+                    <button id="upload-btn" class="btn btn-secondary"><i class="ph-upload-simple"></i><span data-key="upload_image">Upload Image</span></button>
+                    <input type="file" id="file-input" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <div id="history-page" class="page">
+            <h1 data-key="scan_history">Scan History</h1>
+            <div class="card">
+                <div id="history-list">
+                    <p data-key="history_placeholder">Your last 5 scans will appear here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-page" class="page">
+            <h1 data-key="analysis_result">Analysis Result</h1>
+            <div class="card">
+                <img id="result-image" src="" alt="Analyzed leaf">
+                <h2 id="result-disease">Disease Name</h2>
+                <p id="result-crop-confidence" style="color: var(--text-light); margin-top: -0.5rem; margin-bottom: 1rem;">Crop & Confidence</p>
+                <div class="tabs">
+                    <div class="tab active" data-tab="overview-content" data-key="overview">Overview</div>
+                    <div class="tab" data-tab="prevention-content" data-key="prevention">Prevention</div>
+                    <div class="tab" data-tab="treatment-content" data-key="treatment">Treatment</div>
+                </div>
+                <div id="overview-content" class="tab-content active">
+                    <h3 data-key="description">Description</h3>
+                    <p id="result-description">...</p>
+                </div>
+                <div id="prevention-content" class="tab-content">
+                    <h3 data-key="prevention_steps">Prevention Steps</h3>
+                    <p id="result-prevention">...</p>
+                </div>
+                <div id="treatment-content" class="tab-content">
+                    <h3 data-key="treatment_advice">Treatment Advice</h3>
+                    <p id="result-treatment">...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="dashboard-page"><i class="ph-house"></i><span data-key="nav_dashboard">Dashboard</span></button>
+        <button class="nav-btn" data-page="history-page"><i class="ph-clock-counter-clockwise"></i><span data-key="nav_history">History</span></button>
+    </nav>
+
+    <div id="camera-modal">
+        <div id="camera-view">
+            <video id="camera-stream" autoplay playsinline></video>
+            <button id="capture-btn"></button>
+            <button id="close-camera-btn"><i class="ph-x-circle"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pages = document.querySelectorAll('.page');
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const cameraBtn = document.getElementById('camera-btn');
+            const uploadBtn = document.getElementById('upload-btn');
+            const fileInput = document.getElementById('file-input');
+            const cameraModal = document.getElementById('camera-modal');
+            const cameraStream = document.getElementById('camera-stream');
+            const captureBtn = document.getElementById('capture-btn');
+            const closeCameraBtn = document.getElementById('close-camera-btn');
+            const historyList = document.getElementById('history-list');
+            const langSelector = document.getElementById('language-selector');
+
+            // --- TRANSLATION OBJECT ---
+            const translations = {
+                hi: {
+                    dashboard_title: "डैशबोर्ड",
+                    local_conditions: "स्थानीय मौसम",
+                    new_scan: "नया स्कैन शुरू करें",
+                    live_camera: "लाइव कैमरा",
+                    upload_image: "छवि अपलोड करें",
+                    scan_history: "स्कैन इतिहास",
+                    history_placeholder: "आपके अंतिम 5 स्कैन यहां दिखाई देंगे।",
+                    analysis_result: "विश्लेषण परिणाम",
+                    overview: "अवलोकन",
+                    prevention: "निवारण",
+                    treatment: "उपचार",
+                    description: "विवरण",
+                    prevention_steps: "निवारण के चरण",
+                    treatment_advice: "उपचार की सलाह",
+                    nav_dashboard: "डैशबोर्ड",
+                    nav_history: "इतिहास",
+                },
+                te: {
+                    dashboard_title: "డాష్‌బోర్డ్",
+                    local_conditions: "స్థానిక పరిస్థితులు",
+                    new_scan: "కొత్త స్కాన్ ప్రారంభించండి",
+                    live_camera: "లైవ్ కెమెరా",
+                    upload_image: "చిత్రాన్ని అప్‌లోడ్ చేయండి",
+                    scan_history: "స్కాన్ చరిత్ర",
+                    history_placeholder: "మీ చివరి 5 స్కాన్‌లు ఇక్కడ కనిపిస్తాయి.",
+                    analysis_result: "విశ్లేషణ ఫలితం",
+                    overview: "అవలోకనం",
+                    prevention: "నివారణ",
+                    treatment: "చికిత్స",
+                    description: "వివరణ",
+                    prevention_steps: "నివారణ చర్యలు",
+                    treatment_advice: "చికిత్స సలహా",
+                    nav_dashboard: "డాష్‌బోర్డ్",
+                    nav_history: "చరిత్ర",
+                }
+            };
+
+            function setLanguage(lang) {
+                document.querySelectorAll('[data-key]').forEach(el => {
+                    if (!el.dataset.originalText) el.dataset.originalText = el.textContent;
+                    const key = el.dataset.key;
+                    if (lang === 'en') {
+                        el.textContent = el.dataset.originalText;
+                    } else if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+            }
+            langSelector.addEventListener('change', (e) => setLanguage(e.target.value));
+
+            // --- NAVIGATION ---
+            function showPage(pageId) {
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                navButtons.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+            }
+            navButtons.forEach(btn => btn.addEventListener('click', () => {
+                showPage(btn.dataset.page);
+                if (btn.dataset.page === 'history-page') loadHistory();
+            }));
+
+            // --- WEATHER ---
+            function fetchWeather(lat, lon) {
+                fetch('/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lat,
+                        lon
+                    })
+                }).then(res => res.json()).then(data => {
+                    if (data.error) throw new Error(data.error);
+                    document.getElementById('weather-info').textContent = `Temp: ${data.temperature}°C, Humidity: ${data.humidity}%`;
+                    document.getElementById('disease-risk').textContent = data.risk;
+                }).catch(err => {
+                    document.getElementById('weather-info').textContent = "Could not fetch weather data.";
+                });
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+                err => console.warn(`Geolocation Error: ${err.message}`)
+            );
+
+            // --- HISTORY ---
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+                historyList.innerHTML = '';
+                if (history.length === 0) {
+                    historyList.innerHTML = `<p data-key="history_placeholder">Your last 5 scans will appear here.</p>`;
+                    setLanguage(langSelector.value); // Apply translation
+                    return;
+                }
+                history.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'history-item';
+                    el.innerHTML = `
+                        <img src="${item.image}" alt="scan" class="history-thumbnail">
+                        <div class="info">
+                            <div class="disease">${item.crop}: ${item.disease}</div>
+                            <div class="date">${new Date(item.date).toLocaleString()}</div>
+                        </div>`;
+                    historyList.appendChild(el);
+                });
+            }
+
+            function saveHistory(item) {
+                let history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+                history.unshift(item);
+                history = history.slice(0, 5);
+                localStorage.setItem('scanHistory', JSON.stringify(history));
+            }
+
+            // --- CAMERA & UPLOAD ---
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+            cameraBtn.addEventListener('click', openCamera);
+            closeCameraBtn.addEventListener('click', closeCamera);
+            captureBtn.addEventListener('click', capturePhoto);
+
+            let stream;
+            async function openCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'environment'
+                        }
+                    });
+                    cameraStream.srcObject = stream;
+                    cameraModal.style.display = 'flex';
+                } catch (err) {
+                    alert("Could not access the camera. Please ensure you have given permission.");
+                }
+            }
+
+            function closeCamera() {
+                if (stream) stream.getTracks().forEach(track => track.stop());
+                cameraModal.style.display = 'none';
+            }
+
+            function capturePhoto() {
+                const canvas = document.createElement('canvas');
+                canvas.width = cameraStream.videoWidth;
+                canvas.height = cameraStream.videoHeight;
+                canvas.getContext('2d').drawImage(cameraStream, 0, 0);
+                canvas.toBlob(blob => handleFile(blob), 'image/jpeg');
+                closeCamera();
+            }
+
+            async function handleFile(file) {
+                if (!file) return;
+
+                showPage('results-page');
+                document.getElementById('results-page').innerHTML = '<div class="loader"><h2 data-key="analyzing">Analyzing...</h2></div>';
+                setLanguage(langSelector.value);
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async() => {
+                    const imageDataUrl = reader.result;
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        const response = await fetch('/predict', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const result = await response.json();
+                        if (result.error) throw new Error(result.error);
+
+                        displayResults(result, imageDataUrl);
+                        saveHistory({...result,
+                            image: imageDataUrl,
+                            date: new Date()
+                        });
+
+                    } catch (err) {
+                        alert("Prediction failed. Please try again.");
+                        showPage('dashboard-page');
+                    }
+                };
+            }
+
+            function displayResults(data, imageDataUrl) {
+                const resultsPage = document.getElementById('results-page');
+                resultsPage.innerHTML = `
+                    <div class="header"><h1 data-key="analysis_result">Analysis Result</h1></div>
+                    <div class="card">
+                        <img id="result-image" src="${imageDataUrl}" alt="Analyzed leaf" class="result-image">
+                        <h2 id="result-disease">${data.disease}</h2>
+                        <p id="result-crop-confidence" style="color: var(--text-light); margin-top: -0.5rem; margin-bottom: 1rem;">
+                            Detected Crop: ${data.crop} | Confidence: ${(data.confidence * 100).toFixed(1)}%
+                        </p>
+                        <div class="tabs">
+                            <div class="tab active" data-tab="overview-content" data-key="overview">Overview</div>
+                            <div class="tab" data-tab="prevention-content" data-key="prevention">Prevention</div>
+                            <div class="tab" data-tab="treatment-content" data-key="treatment">Treatment</div>
+                        </div>
+                        <div id="overview-content" class="tab-content active"><h3 data-key="description">Description</h3><p>${data.description}</p></div>
+                        <div id="prevention-content" class="tab-content"><h3 data-key="prevention_steps">Prevention Steps</h3><p>${data.prevention}</p></div>
+                        <div id="treatment-content" class="tab-content"><h3 data-key="treatment_advice">Treatment Advice</h3><p>${data.treatment}</p></div>
+                    </div>`;
+
+                resultsPage.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        resultsPage.querySelector('.tab.active').classList.remove('active');
+                        tab.classList.add('active');
+                        resultsPage.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        resultsPage.querySelector(`#${tab.dataset.tab}`).classList.add('active');
+                    });
+                });
+                setLanguage(langSelector.value);
+            }
+
+            // Initial Load
+            loadHistory();
+            document.querySelectorAll('[data-key]').forEach(el => el.dataset.originalText = el.textContent);
+        });
+    </script>
+</body>
+
+</html>
